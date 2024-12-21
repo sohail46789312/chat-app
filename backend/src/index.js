@@ -1,6 +1,13 @@
 import express from "express"
 const app = express()
 
+import cors from "cors"
+app.use(cors({
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
+
 import "./utils/googleStrategy.js"
 import session from 'express-session';
 app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: true }));

@@ -43,7 +43,7 @@ export const signUp = catchAsyncError(async (req, res, next) => {
     }
 })
 
-export const login = catchAsyncError(async (req, res, next) => {
+export const signin = catchAsyncError(async (req, res, next) => {
     let { email, password } = req.body
     try {
         if (!email || !password) {
@@ -57,6 +57,7 @@ export const login = catchAsyncError(async (req, res, next) => {
         }
 
         let isPasswordMatch = await bcryptjs.compare(password, user.password)
+        console.log(isPasswordMatch)
 
         if (!isPasswordMatch) {
             return next(new CustomError(400, "Invalid credentials."))
@@ -150,7 +151,8 @@ export const googleProfile = catchAsyncError(async (req, res, next) => {
         let user = await User.findOne({ email })
 
         if (user) {
-            res.status(200).json(user)
+            sendToken(res, user._id)
+            res.redirect("http://localhost:5173")
             return
         }
 
@@ -168,8 +170,7 @@ export const googleProfile = catchAsyncError(async (req, res, next) => {
         await user.save()
 
         sendToken(res, user._id)
-
-        res.status(200).json(user)
+        res.redirect("http://localhost:5173")
     } catch (error) {
         console.log("error in signUp controller", error)
         return next(new CustomError(500, "internal server error"))
