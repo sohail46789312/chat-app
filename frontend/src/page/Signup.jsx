@@ -16,7 +16,7 @@ const Signup = () => {
     watch,
     formState: { errors }
   } = useForm()
-  
+
   const name = watch("name")
   const email = watch("email")
   const password = watch("password")
@@ -28,15 +28,15 @@ const Signup = () => {
   }
 
   function onSubmit(data) {
-      dispatch(signup(formData))
+    dispatch(signup(formData))
   }
 
-  function handleGoogle () {
-      dispatch(google())
+  function handleGoogle() {
+    dispatch(google())
   }
 
   return (
-    <div className='dark:bg-[#1A2236] dark:text-[#C6C8CD] h-screen flex flex-col items-center gap-8 pt-8'>
+    <div className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
       <h1 className=' text-3xl font-bold '>Sign Up</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div>
@@ -48,11 +48,11 @@ const Signup = () => {
           {errors.email && <p className='text-red-500 text-sm self-start pt-1'>{errors?.email.message}</p>}
         </div>
         <div>
-          <input {...register("password", { required: "Password is required.", minLength: {value: 6, message: "Password must be atleast 6 characters long."} })} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' type="text" placeholder='Password' />
+          <input {...register("password", { required: "Password is required.", minLength: { value: 6, message: "Password must be atleast 6 characters long." } })} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' type="text" placeholder='Password' />
           {errors.password && <p className='text-red-500 text-sm self-start pt-1'>{errors.password.message}</p>}
         </div>
         <p className='text-red-500'>{error}</p>
-        <button className='dark:bg-[#0A80FF] p-3 rounded-md w-80 font-semibold bg-[#0A80FF] text-white'>{status === "loading" ? <PulseLoader color='white' size={"0.5em"}/> : "Sign Up"}</button>
+        <button className='dark:bg-[#0A80FF] p-3 rounded-md w-80 font-semibold bg-[#0A80FF] text-white'>{status === "loading" ? <PulseLoader color='white' size={"0.5em"} /> : "Sign Up"}</button>
       </form>
       <div className=' relative'>
         <div className='h-[1px] dark:bg-white/10 w-80 bg-black/30'></div>

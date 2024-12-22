@@ -69,6 +69,7 @@ const Profile = () => {
             setValue("avatar", e.target.files[0]); 
           }} ref={imageRef} type="file" />
         <button className='dark:bg-[#0A80FF] p-3 rounded-md w-80 font-semibold bg-[#0A80FF] text-white'>{status === "loading" ? <PulseLoader color='white' size={"0.5em"}/> : "Update"}</button>
+                <p className='pt-2 text-sm'><Link to={"/changepassword"} className='text-[#0A80FF]'>Change Password</Link></p>
       </form>
     </div>
   )

@@ -189,3 +189,35 @@ export const googleProfile = catchAsyncError(async (req, res, next) => {
         return next(new CustomError(500, "internal server error"))
     }
 })
+
+export const changePassword = catchAsyncError(async (req, res, next) => {
+    console.log(req.body)
+    try {
+        let { oldPassword, newPassword, confirmPassword } = req.body
+        let userId = req.user._id
+        let user = await User.findById(userId)
+        if (!user) {
+            return next(new CustomError(400, "User not found"))
+        }
+
+        let isPasswordMatced = await bcryptjs.compare(oldPassword, user.password)
+
+        if (!isPasswordMatced) {
+            return next(new CustomError(400, "Old password is incorrect."))
+        }
+
+        if (newPassword !== confirmPassword) {
+            return next(new CustomError(400, "Password doest not match."))
+        }
+
+        const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+        user.password = hashedPassword;
+
+        await user.save();
+
+        res.status(200).json(user)
+    } catch (error) {
+        return next(new CustomError(500, error.message))
+    }
+})

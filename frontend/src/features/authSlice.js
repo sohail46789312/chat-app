@@ -99,6 +99,21 @@ export const updateProfile = createAsyncThunk(
     }
 )
 
+export const changePassword = createAsyncThunk(
+    "user/changepassword",
+    async (data, { rejectWithValue }) => {
+        try {
+            console.log(data)
+            const response = await axios.post(`${BASE_URL}/auth/changepassword`, data, {
+                withCredentials: true
+            })
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.response.data || error.message)
+        }
+    }
+)
+
 export const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -164,6 +179,18 @@ export const authSlice = createSlice({
                 state.user = action.payload
             })
             .addCase(updateProfile.rejected, (state, action) => {
+                state.status = "failed"
+                state.error = action.payload        
+            })
+            .addCase(changePassword.pending, (state, action) => {
+                state.status = "loading"
+            })
+            .addCase(changePassword.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.user = action.payload
+                state.error = null
+            })
+            .addCase(changePassword.rejected, (state, action) => {
                 state.status = "failed"
                 state.error = action.payload        
             })

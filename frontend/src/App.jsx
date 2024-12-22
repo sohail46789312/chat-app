@@ -8,6 +8,7 @@ import Layout from './layout/Layout'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUser } from './features/authSlice'
 import { PulseLoader } from 'react-spinners'
+import ChangePassword from './page/ChangePassword'
 
 const App = () => {
   const [loading, setLoading] = useState(true)
@@ -49,7 +50,11 @@ const App = () => {
         {
           path: "/profile",
           element: <>{user ? <Profile /> : <Navigate to="/signin" />}</>
-        }
+        },
+        {
+          path: "/changepassword",
+          element: <>{user ? <ChangePassword /> : <Navigate to="/signin" />}</>
+        },
       ]
     }
   ])
