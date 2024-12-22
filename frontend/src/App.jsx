@@ -48,7 +48,7 @@ const App = () => {
         },
         {
           path: "/profile",
-          element: <>{user ? <Profile /> : <Navigate to="/profile" />}</>
+          element: <>{user ? <Profile /> : <Navigate to="/signin" />}</>
         }
       ]
     }

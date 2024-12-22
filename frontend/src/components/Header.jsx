@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../features/authSlice'
 import { useNavigate } from 'react-router-dom'
 import { PulseLoader } from 'react-spinners'
+import {Link} from "react-router-dom"
 
 const Header = () => {
   const navigate = useNavigate()
@@ -41,7 +42,7 @@ const Header = () => {
           {user ? <IoMdContact onClick={handleProfile} color='#0A80FF' size={"1.5em"}/> : null}
         </div>
         {show ? <div className='flex flex-col gap-1 border-[1px] rounded-md py-2 pl-2 absolute right-5 top-12 bg-[#0A80FF] text-white shadow-md w-24'>
-          <p className=''>Profile</p>
+          <Link onClick={() => setShow(false)} to={"/profile"} className=''>Profile</Link>
           <p onClick={handleLogout} className=''>{status === "loading" ? <PulseLoader color='white' size={"0.5em"}/> : "Logout"}</p>
         </div> : null}
       </nav>

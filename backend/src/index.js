@@ -4,7 +4,6 @@ const app = express()
 import cors from "cors"
 app.use(cors({
     origin: 'http://localhost:5173',
-    methods: ['GET', 'POST'],
     credentials: true
 }));
 
@@ -23,6 +22,7 @@ import cookieParser from "cookie-parser"
 app.use(cookieParser())
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 import connectDb from "./config/database.config.js"
 connectDb()

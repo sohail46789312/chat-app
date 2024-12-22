@@ -75,6 +75,30 @@ export const getUser = createAsyncThunk(
     }
 )
 
+export const updateProfile = createAsyncThunk(
+    "user/update",
+    async (data, { rejectWithValue }) => {
+        try {
+            console.log(data)
+            let formData = new FormData()
+
+            formData.append("name", data.name)
+            formData.append("email", data.email)
+            formData.append("avatar", data.avatar)
+
+            const response = await axios.post(`${BASE_URL}/auth/update`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                withCredentials: true
+            })
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error.response.data || error.message)
+        }
+    }
+)
+
 export const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -131,6 +155,17 @@ export const authSlice = createSlice({
             })
             .addCase(google.rejected, (state, action) => {
                 state.status = "failed"
+            })
+            .addCase(updateProfile.pending, (state, action) => {
+                state.status = "loading"
+            })
+            .addCase(updateProfile.fulfilled, (state, action) => {
+                state.status = "succeeded"
+                state.user = action.payload
+            })
+            .addCase(updateProfile.rejected, (state, action) => {
+                state.status = "failed"
+                state.error = action.payload        
             })
     }
 })

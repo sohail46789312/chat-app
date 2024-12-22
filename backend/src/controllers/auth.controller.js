@@ -105,34 +105,47 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
 
         let folder = `chat/profile/${user._id}`
 
-        if (!req.file) {
-            return next(new CustomError(400, "Picture is required."))
-        }
+        let updatedUser
 
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            folder,
-            public_id: user._id
-        });
-
-        if (!result) {
-            return next(new CustomError(400, "Failed to upload to cloudinary."))
-        }
-
-        fs.unlink(req.file.path, (err) => {
-            if (err) {
-                return next(new CustomError(400, "Failed to delete file from storage."))
+        if(req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder,
+                public_id: user._id
+            });
+    
+            if (!result) {
+                return next(new CustomError(400, "Failed to upload to cloudinary."))
             }
-        });
-
-        let updatedUser = await User.findByIdAndUpdate(
-            user._id,
-            {
-                $set: {
-                    avatar: result.secure_url
+    
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    return next(new CustomError(400, "Failed to delete file from storage."))
                 }
-            },
-            { new: true }
-        )
+            });
+
+            updatedUser = await User.findByIdAndUpdate(
+                user._id,
+                {
+                    $set: {
+                        avatar: result.secure_url,
+                        name: req.body.name,
+                        email: req.body.email
+                    }
+                },
+                { new: true }
+            )
+        } else {
+            updatedUser = await User.findByIdAndUpdate(
+                user._id,
+                {
+                    $set: {
+                        name: req.body.name,
+                        email: req.body.email
+                    }
+                },
+                { new: true }
+            )
+        }
 
         if (!updatedUser) {
             return next(new CustomError(400, "Failed to upload profile picture."))
