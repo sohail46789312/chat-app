@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgotPassword, getUser, googleProfile, logout, resetPassword, signin, signUp, updateProfile } from "../controllers/auth.controller.js"
+import { changePassword, forgotPassword, getUser, getUsers, googleProfile, logout, resetPassword, signin, signUp, updateProfile } from "../controllers/auth.controller.js"
 import { isLoggedIn } from "../middlewares/auth.middleware.js"
 import upload from "../utils/multer.js"
 import passport from "passport"
@@ -13,6 +13,7 @@ router.post("/update", isLoggedIn, upload.single("avatar"), updateProfile)
 router.post("/changepassword", isLoggedIn, changePassword)
 router.post("/forgotpassword", forgotPassword)
 router.post("/resetpassword", resetPassword)
+router.get("/all", isLoggedIn, getUsers)
 
 router.get("/googleprofile", googleProfile)
 

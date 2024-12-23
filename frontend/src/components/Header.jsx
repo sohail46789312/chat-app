@@ -39,7 +39,7 @@ const Header = () => {
         <div className='flex items-center gap-3'>
           <div onClick={handleClick}>{mode ? <MdOutlineLightMode color='#0A80FF' size={"1.5em"} /> : <MdDarkMode color='#0A80FF' size={"1.5em"} />}</div>
           <IoMdSettings color='#0A80FF' size={"1.5em"}/>
-          {user ? <IoMdContact onClick={handleProfile} color='#0A80FF' size={"1.5em"}/> : null}
+          {user ? <img onClick={handleProfile} className='w-[1.5em] rounded-full' src={user.avatar} /> : <IoMdContact onClick={handleProfile} color='#0A80FF' size={"1.5em"}/>}
         </div>
         {show ? <div className='flex flex-col gap-1 border-[1px] rounded-md py-2 pl-2 absolute right-5 top-12 bg-[#0A80FF] text-white shadow-md w-24'>
           <Link onClick={() => setShow(false)} to={"/profile"} className=''>Profile</Link>

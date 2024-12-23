@@ -14,6 +14,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 import authRoute from "./routes/auth.route.js"
+import messageRoute from "./routes/message.route.js"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -28,6 +29,7 @@ import connectDb from "./config/database.config.js"
 connectDb()
 
 app.use("/api/v1/auth", authRoute)
+app.use("/api/v1/message", messageRoute)
 
 import { ErrorMiddleware } from "./middlewares/error.middleware.js"
 import passport from "passport";

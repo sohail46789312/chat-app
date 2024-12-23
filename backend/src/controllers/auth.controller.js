@@ -298,3 +298,14 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
         })
     }
 })
+
+export const getUsers = catchAsyncError(async (req, res, next) => {
+    try {
+        let user = await User.find({email: req.query.keyword})
+
+        res.status(200).json(user)
+    } catch (error) {
+        console.log("error in getUsers controller")
+        return next(new CustomError(500, error.message))
+    }
+})
