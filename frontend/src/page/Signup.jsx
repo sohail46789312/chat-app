@@ -68,6 +68,7 @@ const Signup = () => {
           <p className=''>Sign up with google</p>
         </button>
         <p className='pt-2 text-sm'>have an account? <Link to={"/signin"} className='text-[#0A80FF]'>Sign in</Link></p>
+        <p className='pt-2 text-sm'><Link to={"/forgotpassword"} className='text-[#0A80FF]'>Forgot Password</Link></p>
       </div>
     </div>
   )
