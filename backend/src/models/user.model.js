@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
         },
         resetPasswordExpire: {
             type: Date
+        },
+        latestMessage: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "message"
         }
     },
     {

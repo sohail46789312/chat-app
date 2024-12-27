@@ -24,7 +24,6 @@ const ForgotPassword = () => {
     let email = watch("email")
 
     async function onSubmit() {
-        console.log(email)
         await dispatch(forgotPassword(email))
         navigate("/resetpassword")
     }

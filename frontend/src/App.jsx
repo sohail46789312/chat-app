@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import { createBrowserRouter, Navigate, RouterProvider, useNavigate } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import Signup from './page/Signup'
 import Signin from './page/Signin'
 import Profile from './page/Profile'
 import Home from './page/Home'
 import Layout from './layout/Layout'
 import { useDispatch, useSelector } from 'react-redux'
-import { getUser } from './features/authSlice'
 import { PulseLoader } from 'react-spinners'
 import ChangePassword from './page/ChangePassword'
 import ForgotPassword from './page/ForgotPassword'
 import ResetPassword from './page/ResetPassword'
+import Message from './page/Message'
+import { getUser } from './features/authSlice'
+import io from "socket.io-client"
 
 const App = () => {
   const [loading, setLoading] = useState(true)
+  const [socket, setSocket] = useState(null)
   const dispatch = useDispatch()
 
-  let { user, status } = useSelector((state) => state.auth)
+  const { user, status } = useSelector((state) => state.auth)
 
+  // Fetch user data and set socket connection when user is available
   useEffect(() => {
     const fetchUserData = async () => {
       await dispatch(getUser())
@@ -26,10 +30,30 @@ const App = () => {
     fetchUserData()
   }, [dispatch])
 
+  useEffect(() => {
+    if (user && user._id) {
+      const socketConnection = io("http://localhost:3000", {
+        query: {
+          userId: user._id,
+        },
+      })
+      setSocket(socketConnection)
+
+      // Cleanup the socket connection when component unmounts or user changes
+      return () => {
+        socketConnection.off("newMessage")
+        socketConnection.disconnect()
+      }
+    }
+  }, [user])
+
+  // Display a loading spinner while data is being fetched
   if (loading) {
-    return <div className='w-screen h-screen flex justify-center bg-[#1A2236]'>
-      <PulseLoader className='absolute top-[50%] -translate-y-1/2' color='#0A80FF' />
-    </div>
+    return (
+      <div className='w-screen h-screen flex justify-center bg-[#1A2236]'>
+        <PulseLoader className='absolute top-[50%] -translate-y-1/2' color='#0A80FF' />
+      </div>
+    )
   }
 
   const router = createBrowserRouter([
@@ -65,9 +89,14 @@ const App = () => {
           path: "/resetpassword",
           element: <>{!user ? <ResetPassword /> : <Navigate to="/" />}</>
         },
+        {
+          path: "/message/:recieverId",
+          element: <>{user && socket ? <Message socket={socket} /> : <Navigate to="/signin" />}</>
+        },
       ]
     }
   ])
+
   return (
     <RouterProvider router={router} />
   )

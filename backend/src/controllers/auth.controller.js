@@ -7,6 +7,7 @@ import cloudinary from "../utils/cloudinary.js"
 import fs from "fs"
 import crypto from "crypto"
 import sendMail from "../utils/sendMail.js"
+import Message from "../models/message.model.js"
 
 export const signUp = catchAsyncError(async (req, res, next) => {
     let { name, email, password } = req.body
@@ -58,7 +59,6 @@ export const signin = catchAsyncError(async (req, res, next) => {
         }
 
         let isPasswordMatch = await bcryptjs.compare(password, user.password)
-        console.log(isPasswordMatch)
 
         if (!isPasswordMatch) {
             return next(new CustomError(400, "Invalid credentials."))
@@ -192,7 +192,6 @@ export const googleProfile = catchAsyncError(async (req, res, next) => {
 })
 
 export const changePassword = catchAsyncError(async (req, res, next) => {
-    console.log(req.body)
     try {
         let { oldPassword, newPassword, confirmPassword } = req.body
         let userId = req.user._id
@@ -261,7 +260,6 @@ export const forgotPassword = catchAsyncError(async (req, res, next) => {
 })
 
 export const resetPassword = catchAsyncError(async (req, res, next) => {
-    console.log(req.body)
     let user
     try {
         const user = await User.findOne({
@@ -269,7 +267,6 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
             resetPasswordExpire: { $gt: Date.now() }
         })
 
-        console.log(user)
 
         if (!user) {
             return next(new CustomError(400, "user not found invalid token"))
@@ -301,11 +298,34 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
 
 export const getUsers = catchAsyncError(async (req, res, next) => {
     try {
-        let user = await User.find({email: req.query.keyword})
+        let user = await User.findOne({email: req.query.keyword})
 
-        res.status(200).json(user)
+        let message = await Message.find({
+            $or: [
+                {recieverId: user._id, senderId: req.user._id},
+                {recieverId: req.user._id, senderId: user._id}
+            ]
+        });
+
+        let latestMessage = message.pop()
+
+        res.status(200).json({user, latestMessage})
     } catch (error) {
         console.log("error in getUsers controller")
+        return next(new CustomError(500, error.message))
+    }
+})
+
+export const usersWithMessage = catchAsyncError(async (req, res, next) => {
+    try {
+        // let users = await User.find({latestMessage: { $exists: true }}).populate("latestMessage")
+        let users = await User.find()
+        
+        // let filteredUsers = users.filter(user => user._id.toString() !== req.user._id.toString()) 
+
+        res.status(200).json(users)
+    } catch (error) {
+        console.log("error in usersWithMessage controller")
         return next(new CustomError(500, error.message))
     }
 })

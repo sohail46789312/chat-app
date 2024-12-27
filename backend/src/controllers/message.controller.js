@@ -1,8 +1,10 @@
 import { catchAsyncError } from "../middlewares/catchAsyncError.js";
 import Message from "../models/message.model.js";
+import User from "../models/user.model.js";
 import cloudinary from "../utils/cloudinary.js";
 import CustomError from "../utils/errorClass.js";
 import fs from "fs"
+import { getRecieverSocketId, io } from "../utils/socket.js";
 
 export const createMessage = catchAsyncError(async (req, res, next) => {
     try {
@@ -38,6 +40,12 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
 
             await message.save()
 
+            const recieverSocketId = getRecieverSocketId(recieverId)
+            if (recieverSocketId) {
+                console.log(recieverSocketId)
+                io.to(recieverSocketId).emit("newMessage", message)
+            }
+
             res.status(200).json(message)
             return
         }
@@ -50,6 +58,21 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
 
         await message.save()
 
+        let user1 = await User.findById(senderId)
+        let user2 = await User.findById(recieverId)
+
+        user1.latestMessage = message
+        user2.latestMessage = message
+
+        await user1.save()
+        await user2.save()
+
+        const recieverSocketId = getRecieverSocketId(recieverId)
+        console.log(1111, recieverSocketId)
+        if (recieverSocketId) {
+            io.emit("newMessage", message)
+        }
+
         res.status(200).json(message)
     } catch (error) {
         console.log("error in createMessage controller")
@@ -58,17 +81,17 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
 })
 
 export const getMessage = catchAsyncError(async (req, res, next) => {
-    console.log(req.user._id)
-    console.log(req.params.recieverId)
     try {
         let messages = await Message.find({
             $or: [
-                {recieverId: req.params.recieverId, senderId: req.user._id},
-                {recieverId: req.user._id, senderId: req.params.recieverId}
+                { recieverId: req.params.recieverId, senderId: req.user._id },
+                { recieverId: req.user._id, senderId: req.params.recieverId }
             ]
         });
 
-        res.status(200).json(messages)
+        let user = await User.findById(req.params.recieverId)
+
+        res.status(200).json({ messages, user })
     } catch (error) {
         console.log("errro in getMessage controller", error)
         return next(new CustomError(500, error.message))

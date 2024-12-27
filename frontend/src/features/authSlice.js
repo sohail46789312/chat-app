@@ -5,6 +5,7 @@ let BASE_URL = "http://localhost:3000/api/v1"
 
 const initialState = {
     user: null,
+    socket: null,
     status: null,
     error: null
 }
@@ -61,6 +62,7 @@ export const google = createAsyncThunk(
     }
 )
 
+
 export const getUser = createAsyncThunk(
     "user/get",
     async (data, { rejectWithValue }) => {
@@ -75,11 +77,11 @@ export const getUser = createAsyncThunk(
     }
 )
 
+
 export const updateProfile = createAsyncThunk(
     "user/update",
     async (data, { rejectWithValue }) => {
         try {
-            console.log(data)
             let formData = new FormData()
 
             formData.append("name", data.name)
@@ -103,7 +105,6 @@ export const changePassword = createAsyncThunk(
     "user/changepassword",
     async (data, { rejectWithValue }) => {
         try {
-            console.log(data)
             const response = await axios.post(`${BASE_URL}/auth/changepassword`, data, {
                 withCredentials: true
             })
@@ -118,8 +119,7 @@ export const forgotPassword = createAsyncThunk(
     "user/forgotpassword",
     async (data, { rejectWithValue }) => {
         try {
-            console.log(data)
-            const response = await axios.post(`${BASE_URL}/auth/forgotpassword`, {email: data})
+            const response = await axios.post(`${BASE_URL}/auth/forgotpassword`, { email: data })
             return response.data
         } catch (error) {
             return rejectWithValue(error.response.data || error.message)
@@ -134,7 +134,7 @@ export const resetPassword = createAsyncThunk(
             let token = data.token
             let newPassword = data.newPassword
             let confirmPassword = data.confirmPassword
-            const response = await axios.post(`${BASE_URL}/auth/resetpassword`, {token, newPassword, confirmPassword})
+            const response = await axios.post(`${BASE_URL}/auth/resetpassword`, { token, newPassword, confirmPassword })
             return response.data
         } catch (error) {
             return rejectWithValue(error.response.data || error.message)
@@ -208,7 +208,7 @@ export const authSlice = createSlice({
             })
             .addCase(updateProfile.rejected, (state, action) => {
                 state.status = "failed"
-                state.error = action.payload        
+                state.error = action.payload
             })
             .addCase(changePassword.pending, (state, action) => {
                 state.status = "loading"
@@ -220,7 +220,7 @@ export const authSlice = createSlice({
             })
             .addCase(changePassword.rejected, (state, action) => {
                 state.status = "failed"
-                state.error = action.payload        
+                state.error = action.payload
             })
             .addCase(forgotPassword.pending, (state, action) => {
                 state.status = "loading"
@@ -229,7 +229,7 @@ export const authSlice = createSlice({
                 state.status = "succeeded"
             })
             .addCase(forgotPassword.rejected, (state, action) => {
-                state.status = "failed"      
+                state.status = "failed"
             })
             .addCase(resetPassword.pending, (state, action) => {
                 state.status = "loading"
@@ -241,7 +241,7 @@ export const authSlice = createSlice({
             })
             .addCase(resetPassword.rejected, (state, action) => {
                 state.status = "failed"
-                state.error = action.payload        
+                state.error = action.payload
             })
     }
 })

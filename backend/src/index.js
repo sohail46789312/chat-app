@@ -1,5 +1,5 @@
 import express from "express"
-const app = express()
+import { app, server } from "./utils/socket.js";
 
 import cors from "cors"
 app.use(cors({
@@ -37,6 +37,6 @@ app.use(ErrorMiddleware)
 
 const port = process.env.PORT
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log("server started on port: ", port)
 })
