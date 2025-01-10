@@ -1,23 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { FaPhone, FaPhoneAlt, FaVideo } from 'react-icons/fa'
 import { LiaCheckDoubleSolid } from 'react-icons/lia'
-import { useDispatch, useSelector } from 'react-redux'
-import { getMessages, sendMessage } from '../features/messageSlice'
 import { useParams } from 'react-router-dom'
 import { IoIosAttach, IoMdSend } from 'react-icons/io'
 import { MdEmojiEmotions } from 'react-icons/md'
+import { useGetMessagesQuery, useSendMessageMutation } from '../app/api'
+import { useSelector } from 'react-redux'
+import { FaPhoneAlt, FaVideo } from 'react-icons/fa'
 
 const Message = ({ socket }) => {
     const [text, setText] = useState("")
-    const { status, users, u, messages, error } = useSelector((state) => state.message)
+    const { recieverId } = useParams();
     const { user } = useSelector((state) => state.auth)
+
+    const { data, isLoading, isError, error } = useGetMessagesQuery(recieverId, {
+        refetchOnMountOrArgChange: true
+    })
+
+    useEffect(() => {
+        if(data?.messages){
+            setLocalMessages(data?.messages)
+        }
+    }, [data?.messages])
+
+    const [sendMessage] = useSendMessageMutation();
 
     const scrollRef = useRef()
 
-    const dispatch = useDispatch()
-    const { recieverId } = useParams();
-
-    const [localMessages, setLocalMessages] = useState(messages || [])
+    const [localMessages, setLocalMessages] = useState([])
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -29,14 +38,10 @@ const Message = ({ socket }) => {
     }, [localMessages])
 
     useEffect(() => {
-        dispatch(getMessages(recieverId))
-    }, [recieverId, dispatch])
-
-    useEffect(() => {
-        if (status === "succeeded") {
-            setLocalMessages(messages)
+        if (!isLoading) {
+            setLocalMessages(data.messages)
         }
-    }, [status, messages])
+    }, [isLoading])
 
     function handleMessage(e) {
         setText(e.target.value)
@@ -47,17 +52,14 @@ const Message = ({ socket }) => {
             message: text,
             recieverId
         }
-        await dispatch(sendMessage(data));
+        sendMessage(data)
         setLocalMessages([...localMessages, data]);
     }
 
     useEffect(() => {
-        if (socket && u) {
+        if (socket && data?.user) {
             socket.on("newMessage", (newMessage) => {
-                console.log(newMessage.senderId)
-                console.log(u._id)
-                if (newMessage.senderId === u._id) {
-                    console.log(2323232323)
+                if (newMessage.senderId === data.user._id) {
                     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
                 }
             });
@@ -66,25 +68,25 @@ const Message = ({ socket }) => {
                 socket.off("newMessage");
             }
         }
-    }, [socket, u]); 
+    }, [socket, data?.user]);
 
     return (
-        <div className='dark:bg-[#1A2236] min-h-screen'>
-            <div className='flex flex-col w-80 m-[auto] pt-4 dark:bg-[#1A2236]'>
-                <div className='flex gap-4 justify-between items-center'>
+        <div style={{minHeight: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236]'>
+            <div className='flex flex-col w-80 m-[auto] dark:bg-[#1A2236]'>
+                <div className='flex gap-4 justify-between items-center sticky top-0 pt-4 dark:bg-[#1A2236]'>
                     <div className='flex gap-2'>
-                        <img className='w-8 h-8 rounded-full' src={status === "succeeded" ? u?.avatar : null} alt="" />
-                        <p className='font-semibold text-xl dark:text-[#C6C8CD]'>{status === "succeeded" ? u?.name : null}</p>
+                        <img className='w-8 h-8 rounded-full' src={data?.user.avatar || null} alt="" />
+                        <p className='font-semibold text-xl dark:text-[#C6C8CD]'>{data?.user.name || null}</p>
                     </div>
                     <div className='flex gap-4 self-end items-center justify-center pb-[12px]'>
-                        <FaPhoneAlt color='#0A80FF' size={"1em"} />
-                        <FaVideo color='#0A80FF' size={"1em"} />
+                        <FaPhoneAlt className='cursor-pointer' color='#0A80FF' size={"1em"} />
+                        <FaVideo className='cursor-pointer' color='#0A80FF' size={"1em"} />
                     </div>
                 </div>
                 <div className='flex flex-col gap-8 mt-8 dark:bg-[#1A2236] pb-20'>
-                    {status === "succeeded" ? localMessages.map((message, i) => (
+                    {!isLoading ? localMessages.map((message, i) => (
                         <div key={i} className={`${message.recieverId === recieverId ? "self-end" : "self-start"} flex gap-2`}>
-                            <img className='w-8 h-8 rounded-full' src={message.recieverId === recieverId ? u.avatar : user.avatar} alt="" />
+                            <img className='w-8 h-8 rounded-full' src={message.recieverId === recieverId ? data.user.avatar : user.avatar} alt="" />
                             <div className='flex items-center px-2 gap-2 bg-[#1A2236] dark:bg-white dark:text-black text-white rounded-md'>
                                 <p>{message.message}</p>
                                 <LiaCheckDoubleSolid color='#0A80FF' size={"1em"} />
@@ -93,17 +95,17 @@ const Message = ({ socket }) => {
                     )) : null}
                     <div ref={scrollRef}></div>
                 </div>
-                <div className='fixed bottom-4 flex w-80 items-center gap-2 dark:bg-[#1A2236] bg-white'>
-                    <MdEmojiEmotions color='#0A80FF' size={"1.5em"} />
+                <div className='fixed bottom-0 pb-4 pt-2 flex w-80 items-center gap-2 dark:bg-[#1A2236] bg-white'>
+                    <MdEmojiEmotions className='cursor-pointer' color='#0A80FF' size={"1.5em"} />
                     <input
                         onChange={handleMessage}
                         value={text}
                         className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60'
                         type="text"
-                        placeholder={user.name}
+                        placeholder="Type a message"
                     />
-                    <IoIosAttach color='#0A80FF' size={"1.5em"} />
-                    <IoMdSend onClick={send} color='#0A80FF' size={"1.5em"} />
+                    <IoIosAttach className='cursor-pointer' color='#0A80FF' size={"1.5em"} />
+                    <IoMdSend className='cursor-pointer' onClick={send} color='#0A80FF' size={"1.5em"} />
                 </div>
             </div>
         </div>

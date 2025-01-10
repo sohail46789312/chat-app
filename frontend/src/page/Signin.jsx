@@ -1,9 +1,10 @@
 import React from 'react'
 import { FaFacebook, FaGoogle } from "react-icons/fa";
 import { useForm } from 'react-hook-form';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { google, signin } from '../features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { PulseLoader } from 'react-spinners';
 
 const Signin = () => {
   const navigate = useNavigate()
@@ -33,7 +34,7 @@ const Signin = () => {
   }
 
   return (
-    <div className='dark:bg-[#1A2236] dark:text-[#C6C8CD] h-screen flex flex-col items-center gap-8 pt-8'>
+    <div style={{height: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236] bg-white dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
       <h1 className=' text-3xl font-bold'>Sign In</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div>
@@ -51,7 +52,7 @@ const Signin = () => {
           {errors.password && <p className='text-red-500 text-sm self-start pt-1'>{errors.password.message}</p>}
         </div>
         <p className='text-red-500'>{error}</p>
-        <button className='dark:bg-[#0A80FF] p-3 rounded-md w-80 font-semibold bg-[#0A80FF] text-white'>Sign In</button>
+        <button className='dark:bg-[#0A80FF] p-3 rounded-md w-80 font-semibold bg-[#0A80FF] text-white'>{status !== "loading" ? "Sign In" : <PulseLoader color='white' size={"0.5em"} />}</button>
       </form>
       <div className=' relative'>
         <div className='h-[1px] dark:bg-white/10 w-80 bg-black/30'></div>

@@ -23,7 +23,7 @@ import cookieParser from "cookie-parser"
 app.use(cookieParser())
 
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+// app.use(express.urlencoded({ extended: true }))
 
 import connectDb from "./config/database.config.js"
 connectDb()

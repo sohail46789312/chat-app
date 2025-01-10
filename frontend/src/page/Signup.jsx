@@ -36,7 +36,7 @@ const Signup = () => {
   }
 
   return (
-    <div className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
+    <div style={{height: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-6'>
       <h1 className=' text-3xl font-bold '>Sign Up</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div>
@@ -67,7 +67,7 @@ const Signup = () => {
           <FaGoogle color='#0A80FF' className='absolute left-3' size={"1.3em"} />
           <p className=''>Sign up with google</p>
         </button>
-        <p className='pt-2 text-sm'>have an account? <Link to={"/signin"} className='text-[#0A80FF]'>Sign in</Link></p>
+        <p className='pt-2 text-sm'>have an account? <Link to={"/signin"} className='text-[#0A80FF]'>{status !== "loading" ? "Sign Up" : <PulseLoader color='white' size={"0.5em"} />}</Link></p>
         <p className='pt-2 text-sm'><Link to={"/forgotpassword"} className='text-[#0A80FF]'>Forgot Password</Link></p>
       </div>
     </div>

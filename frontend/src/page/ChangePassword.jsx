@@ -37,7 +37,7 @@ const ChangePassword = () => {
     }
 
     return (
-        <div className='dark:bg-[#1A2236] dark:text-[#C6C8CD] h-screen flex flex-col items-center gap-8 pt-8'>
+        <div style={{height: "calc(100vh - 64px)"}}  className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
             <h1 className=' text-3xl font-bold'>Change Password</h1>
             <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
                 <div className='relative'>

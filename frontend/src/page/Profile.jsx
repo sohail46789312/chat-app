@@ -48,12 +48,12 @@ const Profile = () => {
   }
 
   return (
-    <div className='dark:bg-[#1A2236] dark:text-[#C6C8CD] h-screen flex flex-col items-center gap-8 pt-8'>
+    <div style={{height: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
       <h1 className=' text-3xl font-bold'>Profile</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div className='relative'>
           <img className='w-28 h-28 rounded-full' src={ image || user.avatar || "https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg"} alt="" />
-          <div onClick={handleImage} className='w-7 h-7 flex items-center justify-center rounded-full bg-[#1A2236] absolute right-2 bottom-1 dark:bg-white'>
+          <div onClick={handleImage} className='w-7 cursor-pointer h-7 flex items-center justify-center rounded-full bg-[#1A2236] absolute right-2 bottom-1 dark:bg-white'>
             <FaCamera color='#0A80FF' className='' />
           </div>
         </div>

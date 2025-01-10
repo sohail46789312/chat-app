@@ -101,6 +101,7 @@ export const getUser = catchAsyncError(async (req, res, next) => {
 })
 
 export const updateProfile = catchAsyncError(async (req, res, next) => {
+    console.log(1)
     try {
         let user = req.user
 
@@ -108,16 +109,16 @@ export const updateProfile = catchAsyncError(async (req, res, next) => {
 
         let updatedUser
 
-        if(req.file) {
+        if (req.file) {
             const result = await cloudinary.uploader.upload(req.file.path, {
                 folder,
                 public_id: user._id
             });
-    
+
             if (!result) {
                 return next(new CustomError(400, "Failed to upload to cloudinary."))
             }
-    
+
             fs.unlink(req.file.path, (err) => {
                 if (err) {
                     return next(new CustomError(400, "Failed to delete file from storage."))
@@ -238,7 +239,7 @@ export const forgotPassword = catchAsyncError(async (req, res, next) => {
 
         const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/ /${resetPasswordToken}`;
         const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`
-        
+
         await sendMail({
             email: user.email,
             subject: 'Express Blog Password Recovery',
@@ -298,34 +299,41 @@ export const resetPassword = catchAsyncError(async (req, res, next) => {
 
 export const getUsers = catchAsyncError(async (req, res, next) => {
     try {
-        let user = await User.findOne({email: req.query.keyword})
+        let user = await User.find({ email: { $regex: req.query.keyword, $options: "i" } })
 
         let message = await Message.find({
             $or: [
-                {recieverId: user._id, senderId: req.user._id},
-                {recieverId: req.user._id, senderId: user._id}
+                { recieverId: user?._id, senderId: req.user._id },
+                { recieverId: req.user._id, senderId: user?._id }
             ]
         });
 
         let latestMessage = message.pop()
 
-        res.status(200).json({user, latestMessage})
+        res.status(200).json({ user, latestMessage })
     } catch (error) {
-        console.log("error in getUsers controller")
+        console.log("error in getUsers controller", error)
         return next(new CustomError(500, error.message))
     }
 })
 
 export const usersWithMessage = catchAsyncError(async (req, res, next) => {
     try {
-        // let users = await User.find({latestMessage: { $exists: true }}).populate("latestMessage")
-        let users = await User.find()
-        
-        // let filteredUsers = users.filter(user => user._id.toString() !== req.user._id.toString()) 
+        let users = await User.find({ latestMessage: { $exists: true } })
+            .populate("latestMessage")
 
-        res.status(200).json(users)
+        const sortedUsers = users.sort((a, b) =>
+            new Date(a.latestMessage.createdAt) - new Date(b.latestMessage.createdAt)
+        );
+
+        let usersWithoutMe = sortedUsers.filter(user => user._id.toString() !== req.user._id.toString())
+
+        let filteredUsers = usersWithoutMe.filter(user => user.latestMessage.senderId?.toString() === req.user._id.toString() || user.latestMessage.recieverId?.toString() === req.user._id.toString())
+
+        console.log(filteredUsers)
+        res.status(200).json(filteredUsers)
     } catch (error) {
-        console.log("error in usersWithMessage controller")
+        console.log("error in usersWithMessage controller", error)
         return next(new CustomError(500, error.message))
     }
 })

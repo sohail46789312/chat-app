@@ -62,7 +62,6 @@ export const google = createAsyncThunk(
     }
 )
 
-
 export const getUser = createAsyncThunk(
     "user/get",
     async (data, { rejectWithValue }) => {
@@ -76,7 +75,6 @@ export const getUser = createAsyncThunk(
         }
     }
 )
-
 
 export const updateProfile = createAsyncThunk(
     "user/update",
