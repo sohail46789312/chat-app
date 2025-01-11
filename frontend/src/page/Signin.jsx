@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaFacebook, FaGoogle } from "react-icons/fa";
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { google, signin } from '../features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { PulseLoader } from 'react-spinners';
+import { GoEyeClosed } from 'react-icons/go';
+import { RxEyeOpen } from 'react-icons/rx';
 
 const Signin = () => {
+  const [pass, setPass] = useState(true)
   const navigate = useNavigate()
   const { user, status, error } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
@@ -34,21 +37,22 @@ const Signin = () => {
   }
 
   return (
-    <div style={{height: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236] bg-white dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
+    <div style={{minHeight: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236] bg-white dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
       <h1 className=' text-3xl font-bold'>Sign In</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div>
           <input {...register("email", { required: "Email is required." })} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' type="text" placeholder='Email' />
           {errors.email && <p className='text-red-500 text-sm self-start pt-1'>{errors?.email.message}</p>}
         </div>
-        <div>
-          <input {...register("password", {
+        <div className='relative'>
+          <input{...register("password", {
             required: "Password is required.",
             minLength: {
               value: 6,
               message: "Password must be at least 6 characters long."
-            }
-          })} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' type="text" placeholder='Password' />
+            },
+          })} type={pass ? "password" : "text"} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder='Password' />
+          {password ? (!pass ? (<GoEyeClosed onClick={() => setPass(!pass)} className='select-none absolute right-3 top-[18px]' />) : (<RxEyeOpen onClick={() => setPass(!pass)} className='select-none absolute right-3 top-[18px]' />)) : null}
           {errors.password && <p className='text-red-500 text-sm self-start pt-1'>{errors.password.message}</p>}
         </div>
         <p className='text-red-500'>{error}</p>
@@ -67,7 +71,7 @@ const Signin = () => {
           <FaGoogle color='#0A80FF' className='absolute left-3' size={"1.3em"} />
           <p className=''>Sign in with google</p>
         </button>
-        <p className='pt-2 text-sm'>have an account? <Link to={"/signup"} className='text-[#0A80FF]'>Sign up</Link></p>
+        <p className='pt-2 text-sm'>have an account? <Link to={"/signup"} className='text-[#0A80FF]'>Sign Up</Link></p>
         <p className='pt-2 text-sm'><Link to={"/forgotpassword"} className='text-[#0A80FF]'>Forgot Password</Link></p>
       </div>
     </div>

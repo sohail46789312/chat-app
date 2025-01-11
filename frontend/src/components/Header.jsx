@@ -80,7 +80,7 @@ const Header = () => {
           {!user ? null : <IoIosSearch className='cursor-pointer select-none' onClick={handleSearch} color='#0A80FF' size={"1.5em"} />}
           {!user ? null : <img onClick={handleProfile} className='w-[1.5em] cursor-pointer rounded-full' src={user.avatar} />}
         </div>
-        {show ? <div className='flex flex-col gap-1 border-[1px] rounded-md py-2 pl-2 absolute right-5 top-12 bg-[#0A80FF] text-white shadow-md w-24'>
+        {show ? <div className='flex flex-col gap-1 border-[1px] rounded-md py-2 pl-2 absolute z-10 right-5 top-12 bg-[#0A80FF] text-white shadow-md w-24'>
           <Link onClick={() => setShow(false)} to={"/profile"} className='cursor-pointer'>Profile</Link>
           <p onClick={handleLogout} className='cursor-pointer'>{status === "loading" ? <PulseLoader color='white' size={"0.5em"} /> : "Logout"}</p>
         </div> : null}

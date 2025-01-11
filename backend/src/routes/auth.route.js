@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgotPassword, getUser, getUsers, googleProfile, logout, resetPassword, signin, signUp, updateProfile, usersWithMessage } from "../controllers/auth.controller.js"
+import { changePassword, failure, forgotPassword, getUser, getUsers, googleProfile, logout, resetPassword, signin, signUp, updateProfile, usersWithMessage } from "../controllers/auth.controller.js"
 import { isLoggedIn } from "../middlewares/auth.middleware.js"
 import upload from "../utils/multer.js"
 import passport from "passport"
@@ -14,9 +14,10 @@ router.post("/changepassword", isLoggedIn, changePassword)
 router.post("/forgotpassword", forgotPassword)
 router.post("/resetpassword", resetPassword)
 router.get("/all", isLoggedIn, getUsers)
-router.get("/withmessage", isLoggedIn, usersWithMessage)
+router.post("/withmessage", isLoggedIn, usersWithMessage)
 
 router.get("/googleprofile", googleProfile)
+router.get("/failureredirect", failure)
 
 router.get('/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })

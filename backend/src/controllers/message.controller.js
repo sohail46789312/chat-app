@@ -74,7 +74,7 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
 
         const recieverSocketId = getRecieverSocketId(recieverId)
         if (recieverSocketId) {
-            io.emit("newMessage", message)
+            io.to(recieverSocketId).emit("newMessage", message)
         }
 
 

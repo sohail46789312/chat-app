@@ -28,7 +28,7 @@ export const usersWithMessage = createAsyncThunk(
     "users/withmessage",
     async (data, { rejectWithValue }) => {
         try {
-            let response = await axios.get(`${BASE_URL}/auth/withmessage/`, {
+            let response = await axios.post(`${BASE_URL}/auth/withmessage/`, { data }, {
                 withCredentials: true
             })
             return response.data

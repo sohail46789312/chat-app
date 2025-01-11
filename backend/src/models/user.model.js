@@ -25,8 +25,7 @@ const userSchema = new mongoose.Schema(
             type: Date
         },
         latestMessage: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "message"
+            type: Object,
         }
     },
     {

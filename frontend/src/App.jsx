@@ -13,6 +13,7 @@ import ResetPassword from './page/ResetPassword'
 import Message from './page/Message'
 import { getUser } from './features/authSlice'
 import io from "socket.io-client"
+import { Toaster } from 'react-hot-toast'
 
 const App = () => {
   const [loading, setLoading] = useState(true)
@@ -21,7 +22,6 @@ const App = () => {
 
   const { user, status } = useSelector((state) => state.auth)
 
-  // Fetch user data and set socket connection when user is available
   useEffect(() => {
     const fetchUserData = async () => {
       await dispatch(getUser())
@@ -63,7 +63,7 @@ const App = () => {
       children: [
         {
           path: "/",
-          element: <>{user ? <Home /> : <Navigate to="/signin" />}</>
+          element: <>{user && socket ? <Home socket={socket} /> : <Navigate to="/signin" />}</>
         },
         {
           path: "/signin",
@@ -98,7 +98,10 @@ const App = () => {
   ])
 
   return (
-    <RouterProvider router={router} />
+    <div>
+      <Toaster />
+      <RouterProvider router={router} />
+    </div>
   )
 }
 

@@ -101,7 +101,6 @@ export const getUser = catchAsyncError(async (req, res, next) => {
 })
 
 export const updateProfile = catchAsyncError(async (req, res, next) => {
-    console.log(1)
     try {
         let user = req.user
 
@@ -190,6 +189,10 @@ export const googleProfile = catchAsyncError(async (req, res, next) => {
         console.log("error in signUp controller", error)
         return next(new CustomError(500, "internal server error"))
     }
+})
+
+export const failure = catchAsyncError(async (req, res, next) => {
+    res.redirect("http://localhost:5173")
 })
 
 export const changePassword = catchAsyncError(async (req, res, next) => {
@@ -319,18 +322,35 @@ export const getUsers = catchAsyncError(async (req, res, next) => {
 
 export const usersWithMessage = catchAsyncError(async (req, res, next) => {
     try {
-        let users = await User.find({ latestMessage: { $exists: true } })
-            .populate("latestMessage")
+        let messages = await Message.find({
+            $or: [
+                { senderId: req.user._id },
+                { recieverId: req.user._id }
+            ]
+        });
+
+        let users = await User.find()
+
+        async function func() {
+            for (const user of users) {
+                let latestMessageFilter = messages.filter(m => m.senderId.toString() === user._id.toString() || m.recieverId.toString() === user._id.toString())
+                let latestM = latestMessageFilter.pop()
+                user.latestMessage = latestM
+                await user.save()
+            }
+        }
+        await func()
+
+        users = await User.find()
 
         const sortedUsers = users.sort((a, b) =>
-            new Date(a.latestMessage.createdAt) - new Date(b.latestMessage.createdAt)
+            new Date(a.latestMessage?.createdAt) - new Date(b.latestMessage?.createdAt)
         );
 
         let usersWithoutMe = sortedUsers.filter(user => user._id.toString() !== req.user._id.toString())
 
-        let filteredUsers = usersWithoutMe.filter(user => user.latestMessage.senderId?.toString() === req.user._id.toString() || user.latestMessage.recieverId?.toString() === req.user._id.toString())
+        let filteredUsers = usersWithoutMe.filter(user => user.latestMessage?.senderId?.toString() === req.user._id.toString() || user.latestMessage?.recieverId?.toString() === req.user._id.toString())
 
-        console.log(filteredUsers)
         res.status(200).json(filteredUsers)
     } catch (error) {
         console.log("error in usersWithMessage controller", error)

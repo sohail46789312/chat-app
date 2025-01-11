@@ -37,20 +37,20 @@ const ChangePassword = () => {
     }
 
     return (
-        <div style={{height: "calc(100vh - 64px)"}}  className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
+        <div style={{minHeight: "calc(100vh - 64px)"}}  className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
             <h1 className=' text-3xl font-bold'>Change Password</h1>
             <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
                 <div className='relative'>
                     <input value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} type={showOldPassword ? "text" : "password"} {...register("oldPassword")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="Old Password" />
-                    {showOldPassword ? <GoEyeClosed onClick={() => setShowOldPassword(!showOldPassword)} className='absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowOldPassword(!showOldPassword)} className='absolute right-3 top-[18px]' />}
+                    {oldPassword ? (showOldPassword ? <GoEyeClosed onClick={() => setShowOldPassword(!showOldPassword)} className='select-none absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowOldPassword(!showOldPassword)} className='select-none absolute right-3 top-[18px]' />) : null}
                 </div>
                 <div className='relative'>
                     <input value={newPassword} onChange={(e) => setNewPassword(e.target.value)} type={showNewPassword ? "text" : "password"} {...register("newPassword")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="New Passsword" />
-                    {showNewPassword ? <GoEyeClosed onClick={() => setShowNewPassword(!showNewPassword)} className='absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowNewPassword(!showNewPassword)} className='absolute right-3 top-[18px]' />}
+                    {newPassword ? (showNewPassword ? <GoEyeClosed onClick={() => setShowNewPassword(!showNewPassword)} className='select-none absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowNewPassword(!showNewPassword)} className='select-none absolute right-3 top-[18px]' />) : null}
                 </div>
                 <div className='relative'>
                     <input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type={showConfirmPassword ? "text" : "password"} {...register("confirmPassword")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="Confirm Password" />
-                    {showConfirmPassword ? <GoEyeClosed onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='absolute right-3 top-[18px]' />}
+                    {confirmPassword ? (showConfirmPassword ? <GoEyeClosed onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='select-none absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='select-none absolute right-3 top-[18px]' />) : null}
                 </div>
                 <p className='text-red-500'>{error?.message}</p>
                 <button className='dark:bg-[#0A80FF] p-3 rounded-md w-80 font-semibold bg-[#0A80FF] text-white'>{status === "loading" ? <PulseLoader color='white' size={"0.5em"} /> : "Update"}</button>

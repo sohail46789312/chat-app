@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios"
+import toast from "react-hot-toast";
 
 let BASE_URL = "http://localhost:3000/api/v1"
 
@@ -12,13 +13,21 @@ const initialState = {
 
 export const signup = createAsyncThunk(
     "auth/signup",
-    async (data, { rejectWithValue }) => {
+    async (sender, { rejectWithValue }) => {
         try {
-            const response = await axios.post(`${BASE_URL}/auth/signup`, data, {
+            const response = await axios.post(`${BASE_URL}/auth/signup`, sender, {
                 withCredentials: true
             })
+
+            toast.success("Sign up successfully", {
+                duration: 1000
+            })
+
             return response.data
         } catch (error) {
+            toast.error("Failed to Sign up", {
+                duration: 1000
+            })
             return rejectWithValue(error.response.data || error.message)
         }
     }
@@ -31,8 +40,16 @@ export const signin = createAsyncThunk(
             let response = await axios.post(`${BASE_URL}/auth/signin`, data, {
                 withCredentials: true
             })
+
+            toast.success("Signed in successfully.", {
+                duration: 1000
+            })
+
             return response.data
         } catch (error) {
+            toast.error("Failed to Sign in", {
+                duration: 1000
+            })
             return rejectWithValue(error.response.data || error.message)
         }
     }
@@ -45,7 +62,14 @@ export const logout = createAsyncThunk(
             let response = await axios.get(`${BASE_URL}/auth/logout`, {
                 withCredentials: true
             })
+
+            toast.success("Logout successfully", {
+                duration: 1000
+            })
         } catch (error) {
+            toast.error("Failed to logout", {
+                duration: 1000
+            })
             return (rejectWithValue(error.response.data || error.message))
         }
     }
@@ -92,8 +116,14 @@ export const updateProfile = createAsyncThunk(
                 },
                 withCredentials: true
             })
+            toast.success("Profile updated successfully", {
+                duration: 1000
+            })
             return response.data
         } catch (error) {
+            toast.error("Failed to update profile", {
+                duration: 1000
+            })
             return rejectWithValue(error.response.data || error.message)
         }
     }
@@ -106,8 +136,14 @@ export const changePassword = createAsyncThunk(
             const response = await axios.post(`${BASE_URL}/auth/changepassword`, data, {
                 withCredentials: true
             })
+            toast.success("Password Changed Successfully", {
+                duration: 1000
+            })
             return response.data
         } catch (error) {
+            toast.error("Failed to change password", {
+                duration: 1000
+            })
             return rejectWithValue(error.response.data || error.message)
         }
     }
@@ -118,8 +154,14 @@ export const forgotPassword = createAsyncThunk(
     async (data, { rejectWithValue }) => {
         try {
             const response = await axios.post(`${BASE_URL}/auth/forgotpassword`, { email: data })
+            toast.success("Email sent successfully", {
+                duration: 1000
+            })
             return response.data
         } catch (error) {
+            toast.error("Failed to send email", {
+                duration: 1000
+            })
             return rejectWithValue(error.response.data || error.message)
         }
     }
@@ -133,8 +175,14 @@ export const resetPassword = createAsyncThunk(
             let newPassword = data.newPassword
             let confirmPassword = data.confirmPassword
             const response = await axios.post(`${BASE_URL}/auth/resetpassword`, { token, newPassword, confirmPassword })
+            toast.success("Password reset successfully", {
+                duration: 1000
+            })
             return response.data
         } catch (error) {
+            toast.error("Failed to reset password", {
+                duration: 1000
+            })
             return rejectWithValue(error.response.data || error.message)
         }
     }
