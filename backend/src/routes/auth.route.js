@@ -14,7 +14,7 @@ router.post("/changepassword", isLoggedIn, changePassword)
 router.post("/forgotpassword", forgotPassword)
 router.post("/resetpassword", resetPassword)
 router.get("/all", isLoggedIn, getUsers)
-router.post("/withmessage", isLoggedIn, usersWithMessage)
+router.get("/withmessage", isLoggedIn, usersWithMessage)
 
 router.get("/googleprofile", googleProfile)
 router.get("/failureredirect", failure)

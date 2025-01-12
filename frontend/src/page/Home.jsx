@@ -3,20 +3,36 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUsers, usersWithMessage } from '../features/messageSlice'
 import { useNavigate } from 'react-router-dom'
 import { PulseLoader } from 'react-spinners'
+import { useUsersWithMessagesQuery } from '../app/api'
 
 const Home = ({ socket }) => {
   let { message, users, status, errro } = useSelector((state) => state.message)
+  console.log(users)
   const [formattedTimes, setFormattedTimes] = useState({})
-  // const [count, setCount] = useState(0)
+  const [uusers, setUsers] = useState([])
 
   const { user } = useSelector((state) => state.auth)
   const [newMsg, setNewMsg] = useState()
   const navigate = useNavigate()
 
+  const { data, isError, isLoading, error, refetch } = useUsersWithMessagesQuery()
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+
   const dispatch = useDispatch()
   useEffect(() => {
-    dispatch(usersWithMessage(user._id))
-  }, [])
+    if(data) {
+      dispatch(usersWithMessage(data))
+      setUsers(data)
+    }
+  }, [data])
+
+  useEffect(() => {
+    setUsers(users)
+  }, [users])
 
   function getTime(createdAt) {
     const now = new Date();
@@ -61,7 +77,7 @@ const Home = ({ socket }) => {
     if (socket) {
       socket.on("newMessage", (newMessage) => {
         setNewMsg(newMessage)
-
+        refetch()
         count = count === "null" ? 1 : Number(count) + 1
         localStorage.setItem("newMessageCount", count)
         localStorage.setItem("senderId", newMessage.senderId)
@@ -90,7 +106,7 @@ const Home = ({ socket }) => {
 
   return (
     <div className='dark:bg-[#1A2236] dark:text-white flex flex-col items-center pt-4 gap-4' style={{ minHeight: "calc(100vh - 64px)" }}>
-      {status === "succeeded" && Array.isArray(users) && users[0] !== null ? [...users].reverse().map((user, i) => {
+      {!isLoading && Array.isArray(uusers) && uusers[0] !== null ? uusers.map((user, i) => {
         const timeSource = newMsg && newMsg.senderId === user._id
           ? newMsg.createdAt
           : user?.latestMessage?.createdAt

@@ -344,7 +344,7 @@ export const usersWithMessage = catchAsyncError(async (req, res, next) => {
         users = await User.find()
 
         const sortedUsers = users.sort((a, b) =>
-            new Date(a.latestMessage?.createdAt) - new Date(b.latestMessage?.createdAt)
+            new Date(b.latestMessage?.createdAt) - new Date(a.latestMessage?.createdAt)
         );
 
         let usersWithoutMe = sortedUsers.filter(user => user._id.toString() !== req.user._id.toString())

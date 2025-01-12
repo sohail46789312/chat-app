@@ -11,6 +11,7 @@ import { getUsers, usersWithMessage } from '../features/messageSlice'
 import { IoCloseOutline } from 'react-icons/io5'
 
 const Header = () => {
+  let { message, users, errro } = useSelector((state) => state.message)
   const navigate = useNavigate()
   const [mode, setMode] = useState(localStorage.getItem("theme") === "dark" ? true : (localStorage.getItem("theme") === null ? null : false))
   const [show, setShow] = useState(false)
@@ -57,7 +58,7 @@ const Header = () => {
 
   function handleQuery(e) {
     if (e.target.value === "") {
-      dispatch(usersWithMessage())
+      dispatch(usersWithMessage(users))
     } else {
       dispatch(getUsers(e.target.value))
     }

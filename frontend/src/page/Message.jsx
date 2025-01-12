@@ -100,7 +100,7 @@ const Message = ({ socket }) => {
                     <input
                         onChange={handleMessage}
                         value={text}
-                        className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60'
+                        className='bg-transparent dark:text-white p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60'
                         type="text"
                         placeholder="Type a message"
                     />

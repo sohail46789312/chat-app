@@ -39,7 +39,6 @@ const App = () => {
       })
       setSocket(socketConnection)
 
-      // Cleanup the socket connection when component unmounts or user changes
       return () => {
         socketConnection.off("newMessage")
         socketConnection.disconnect()
@@ -47,7 +46,6 @@ const App = () => {
     }
   }, [user])
 
-  // Display a loading spinner while data is being fetched
   if (loading) {
     return (
       <div className='w-screen h-screen flex justify-center bg-[#1A2236]'>
