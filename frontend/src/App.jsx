@@ -4,6 +4,7 @@ import Signup from './page/Signup'
 import Signin from './page/Signin'
 import Profile from './page/Profile'
 import Home from './page/Home'
+import NewGroup from './page/NewGroup'
 import Layout from './layout/Layout'
 import { useDispatch, useSelector } from 'react-redux'
 import { PulseLoader } from 'react-spinners'
@@ -62,6 +63,10 @@ const App = () => {
         {
           path: "/",
           element: <>{user && socket ? <Home socket={socket} /> : <Navigate to="/signin" />}</>
+        },
+        {
+          path: "/newgroup",
+          element: <>{user && socket ? <NewGroup socket={socket} /> : <Navigate to="/signin" />}</>
         },
         {
           path: "/signin",

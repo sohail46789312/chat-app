@@ -11,7 +11,7 @@ import { getUsers, usersWithMessage } from '../features/messageSlice'
 import { IoCloseOutline } from 'react-icons/io5'
 
 const Header = () => {
-  let { message, users, errro } = useSelector((state) => state.message)
+  let { message, users, prevUsers, errro } = useSelector((state) => state.message)
   const navigate = useNavigate()
   const [mode, setMode] = useState(localStorage.getItem("theme") === "dark" ? true : (localStorage.getItem("theme") === null ? null : false))
   const [show, setShow] = useState(false)
@@ -58,7 +58,7 @@ const Header = () => {
 
   function handleQuery(e) {
     if (e.target.value === "") {
-      dispatch(usersWithMessage(users))
+      dispatch(usersWithMessage(prevUsers))
     } else {
       dispatch(getUsers(e.target.value))
     }
@@ -81,7 +81,8 @@ const Header = () => {
           {!user ? null : <IoIosSearch className='cursor-pointer select-none' onClick={handleSearch} color='#0A80FF' size={"1.5em"} />}
           {!user ? null : <img onClick={handleProfile} className='w-[1.5em] cursor-pointer rounded-full' src={user.avatar} />}
         </div>
-        {show ? <div className='flex flex-col gap-1 border-[1px] rounded-md py-2 pl-2 absolute z-10 right-5 top-12 bg-[#0A80FF] text-white shadow-md w-24'>
+        {show ? <div className='flex flex-col gap-1 border-[1px] rounded-md py-2 pl-2 absolute z-10 right-5 top-12 bg-[#0A80FF] text-white shadow-md w-28'>
+          <Link onClick={() => setShow(false)} to={"/newgroup"} className='cursor-pointer'>New Group</Link>
           <Link onClick={() => setShow(false)} to={"/profile"} className='cursor-pointer'>Profile</Link>
           <p onClick={handleLogout} className='cursor-pointer'>{status === "loading" ? <PulseLoader color='white' size={"0.5em"} /> : "Logout"}</p>
         </div> : null}

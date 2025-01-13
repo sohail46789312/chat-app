@@ -8,6 +8,7 @@ import fs from "fs"
 import crypto from "crypto"
 import sendMail from "../utils/sendMail.js"
 import Message from "../models/message.model.js"
+import Group from "../models/group.model.js"
 
 export const signUp = catchAsyncError(async (req, res, next) => {
     let { name, email, password } = req.body
@@ -311,9 +312,11 @@ export const getUsers = catchAsyncError(async (req, res, next) => {
             ]
         });
 
+        let usersWithoutMe = user.filter(user => user._id.toString() !== req.user._id.toString())
+
         let latestMessage = message.pop()
 
-        res.status(200).json({ user, latestMessage })
+        res.status(200).json({ user: usersWithoutMe, latestMessage })
     } catch (error) {
         console.log("error in getUsers controller", error)
         return next(new CustomError(500, error.message))
@@ -342,6 +345,7 @@ export const usersWithMessage = catchAsyncError(async (req, res, next) => {
         await func()
 
         users = await User.find()
+        let groups = await Group.find()
 
         const sortedUsers = users.sort((a, b) =>
             new Date(b.latestMessage?.createdAt) - new Date(a.latestMessage?.createdAt)
@@ -350,6 +354,7 @@ export const usersWithMessage = catchAsyncError(async (req, res, next) => {
         let usersWithoutMe = sortedUsers.filter(user => user._id.toString() !== req.user._id.toString())
 
         let filteredUsers = usersWithoutMe.filter(user => user.latestMessage?.senderId?.toString() === req.user._id.toString() || user.latestMessage?.recieverId?.toString() === req.user._id.toString())
+        filteredUsers.push(...groups)
 
         res.status(200).json(filteredUsers)
     } catch (error) {

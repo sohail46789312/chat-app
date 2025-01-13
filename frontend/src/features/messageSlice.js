@@ -5,6 +5,7 @@ let BASE_URL = "http://localhost:3000/api/v1"
 
 const initialState = {
     users: [],
+    prevUsers: [],
     u: null,
     status: null,
     error: null
@@ -53,6 +54,7 @@ export const messageSlice = createSlice({
             .addCase(usersWithMessage.fulfilled, (state, action) => {
                 state.status = "succeeded"
                 state.users = action.payload
+                state.prevUsers = action.payload
             })
             .addCase(usersWithMessage.rejected, (state, action) => {
                 state.status = "failed"

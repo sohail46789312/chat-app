@@ -48,18 +48,28 @@ const Message = ({ socket }) => {
     }
 
     async function send() {
-        let data = {
+        const newMessage = {
             message: text,
+            senderId: user._id,
             recieverId
-        }
-        sendMessage(data)
-        setLocalMessages([...localMessages, data]);
+        };
+        
+        setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
+
+        sendMessage(newMessage);
+
+        setText('');
     }
 
     useEffect(() => {
         if (socket && data?.user) {
             socket.on("newMessage", (newMessage) => {
                 if (newMessage.senderId === data.user._id) {
+                    setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
+                }
+            });
+            socket.on("newGroupMessage", (newMessage) => {
+                if (data?.user?.members?.includes(newMessage.senderId)) {
                     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
                 }
             });
@@ -75,8 +85,8 @@ const Message = ({ socket }) => {
             <div className='flex flex-col w-80 m-[auto] dark:bg-[#1A2236]'>
                 <div className='flex gap-4 justify-between items-center sticky top-0 pt-4 dark:bg-[#1A2236]'>
                     <div className='flex gap-2'>
-                        <img className='w-8 h-8 rounded-full' src={data?.user.avatar || null} alt="" />
-                        <p className='font-semibold text-xl dark:text-[#C6C8CD]'>{data?.user.name || null}</p>
+                        <img className='w-8 h-8 rounded-full' src={data?.user?.avatar || null} alt="" />
+                        <p className='font-semibold text-xl dark:text-[#C6C8CD]'>{data?.user?.name || null}</p>
                     </div>
                     <div className='flex gap-4 self-end items-center justify-center pb-[12px]'>
                         <FaPhoneAlt className='cursor-pointer' color='#0A80FF' size={"1em"} />
@@ -84,8 +94,8 @@ const Message = ({ socket }) => {
                     </div>
                 </div>
                 <div className='flex flex-col gap-8 mt-8 dark:bg-[#1A2236] pb-20'>
-                    {!isLoading ? localMessages.map((message, i) => (
-                        <div key={i} className={`${message.recieverId === recieverId ? "self-end" : "self-start"} flex gap-2`}>
+                    {!isLoading && user ? localMessages.map((message, i) => (
+                        <div key={i} className={`${message.senderId === user._id ? "self-end" : "self-start"} flex gap-2`}>
                             <img className='w-8 h-8 rounded-full' src={message.recieverId === recieverId ? data.user.avatar : user.avatar} alt="" />
                             <div className='flex items-center px-2 gap-2 bg-[#1A2236] dark:bg-white dark:text-black text-white rounded-md'>
                                 <p>{message.message}</p>

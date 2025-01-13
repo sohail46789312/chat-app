@@ -15,6 +15,7 @@ app.use(passport.session());
 
 import authRoute from "./routes/auth.route.js"
 import messageRoute from "./routes/message.route.js"
+import groupRoute from "./routes/group.route.js"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -30,6 +31,7 @@ connectDb()
 
 app.use("/api/v1/auth", authRoute)
 app.use("/api/v1/message", messageRoute)
+app.use("/api/v1/group", groupRoute)
 
 import { ErrorMiddleware } from "./middlewares/error.middleware.js"
 import passport from "passport";

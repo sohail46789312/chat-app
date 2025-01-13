@@ -88,20 +88,6 @@ const Home = ({ socket }) => {
 
         refetch();
       });
-      socket.on('newGroupMessage', (newMessage) => {
-          setCount((prev) => {
-            const currentCount = prev[newMessage.recieverId] || 0;
-            const updatedCount = {
-              ...prev,
-              [newMessage.recieverId]: currentCount + 1,
-            };
-  
-            localStorage.setItem("count", JSON.stringify(updatedCount));
-  
-            return updatedCount;
-          });
-        refetch();
-      });
 
       return () => {
         socket.off('newMessage');
@@ -130,6 +116,7 @@ const Home = ({ socket }) => {
       className="dark:bg-[#1A2236] dark:text-white flex flex-col items-center pt-4 gap-4"
       style={{ minHeight: 'calc(100vh - 64px)' }}
     >
+      <h1 className=' text-3xl font-bold pb-4'>Create New Group</h1>
       {!isLoading && Array.isArray(uusers) && uusers[0] !== null ? (
         uusers.map((user, i) => {
           const timeSource = newMsg && newMsg.senderId === user._id
