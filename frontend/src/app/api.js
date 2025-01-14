@@ -35,6 +35,23 @@ export const api = createApi({
                 credentials: "include"
             })
         }),
+        createGroup: builder.mutation({
+            query: (data) => {
+
+                let formData = new FormData()
+
+                formData.append("name", data.name)
+                formData.append("avatar", data.avatar)
+                formData.append("members", JSON.stringify(data.members))
+
+                return {
+                    url:`/group/create`,
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"
+                }
+            }
+        })
     }),
 });
 
@@ -42,5 +59,6 @@ export const {
     useSendMessageMutation,
     useGetMessagesQuery,
     useUsersWithMessagesQuery,
-    useSearchUsersQuery
+    useSearchUsersQuery,
+    useCreateGroupMutation
 } = api;

@@ -21,8 +21,10 @@ const Home = ({ socket }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    if (!isLoading && !isError) {
+      refetch();
+    }
+  }, [refetch, isLoading, isError]);
 
   useEffect(() => {
     if (data) {
@@ -86,7 +88,9 @@ const Home = ({ socket }) => {
           });
         setNewMsg(newMessage);
 
-        refetch();
+        if (!isLoading && !isError) {
+          refetch();
+        }
       });
       socket.on('newGroupMessage', (newMessage) => {
           setCount((prev) => {
@@ -100,7 +104,10 @@ const Home = ({ socket }) => {
   
             return updatedCount;
           });
-        refetch();
+          localStorage.setItem([newMessage.recieverId], newMessage.message)
+          if (!isLoading && !isError) {
+            refetch();
+          }
       });
 
       return () => {
@@ -144,7 +151,7 @@ const Home = ({ socket }) => {
             >
               <div className="flex gap-3 items-center">
                 <img
-                  className="w-14 h-14 rounded-full"
+                  className="w-14 h-14 rounded-full object-cover"
                   src={
                     user?.avatar ||
                     'https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg'
@@ -157,8 +164,8 @@ const Home = ({ socket }) => {
                   </h2>
                   <p className="text-sm">
                     {newMsg && newMsg.senderId === user._id
-                      ? newMsg.message
-                      : user?.latestMessage?.message}
+                      ? (newMsg.message)
+                      : (localStorage.getItem(user._id) ? localStorage.getItem(user._id) : user?.latestMessage?.message)}
                   </p>
                 </div>
               </div>

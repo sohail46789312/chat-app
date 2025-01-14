@@ -345,7 +345,7 @@ export const usersWithMessage = catchAsyncError(async (req, res, next) => {
         await func()
 
         users = await User.find()
-        let groups = await Group.find()
+        let groups = await Group.find({ members: req.user._id })
 
         const sortedUsers = users.sort((a, b) =>
             new Date(b.latestMessage?.createdAt) - new Date(a.latestMessage?.createdAt)

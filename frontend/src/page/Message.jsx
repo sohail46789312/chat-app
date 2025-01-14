@@ -69,6 +69,7 @@ const Message = ({ socket }) => {
                 }
             });
             socket.on("newGroupMessage", (newMessage) => {
+                console.log(newMessage)
                 if (data?.user?.members?.includes(newMessage.senderId)) {
                     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
                 }

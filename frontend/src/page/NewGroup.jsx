@@ -1,115 +1,79 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { usersWithMessage } from '../features/messageSlice';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PulseLoader } from 'react-spinners';
-import { useUsersWithMessagesQuery } from '../app/api';
+import { useCreateGroupMutation, useUsersWithMessagesQuery } from '../app/api';
+import { CgAdd } from 'react-icons/cg';
+import { IoIosAdd, IoIosRemove } from 'react-icons/io';
+import { useForm } from 'react-hook-form';
+import { FaCamera } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const Home = ({ socket }) => {
   const { users, status } = useSelector((state) => state.message);
-  const [formattedTimes, setFormattedTimes] = useState({});
   const [uusers, setUsers] = useState([]);
-  const [count, setCount] = useState(() => {
-    const storedCount = localStorage.getItem("count");
-    return storedCount ? JSON.parse(storedCount) : {};
-  });
-  const [newMsg, setNewMsg] = useState(null);
+  const [members, setMembers] = useState([]);
+  const navigate = useNavigate()
 
   const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
-
-  useEffect(() => {
-    if (data) {
-      dispatch(usersWithMessage(data));
-      setUsers(data);
-    }
-  }, [data, dispatch]);
 
   useEffect(() => {
     setUsers(users);
   }, [users]);
 
-  function getTime(createdAt) {
-    const now = new Date();
-    const timeDifference = now - new Date(createdAt);
+  const dispatch = useDispatch()
+  let { user, error } = useSelector((state) => state.auth)
+  const [name, setName] = useState()
+  const [email, setEmail] = useState()
+  const [image, setImage] = useState()
 
-    const seconds = Math.floor(timeDifference / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
+  const imageRef = useRef(null)
 
-    if (minutes < 1) return 'Now';
-    if (minutes < 2) return `${minutes} minute ago`;
-    if (minutes < 60) return `${minutes} minutes ago`;
-    if (hours < 24) return `${hours} hours ago`;
-    if (days === 1) return 'Yesterday';
-    if (days < 2) return `${days} days ago`;
+  function handleFileInput(e) {
+    let file = e.target.files[0];
+    let reader = new FileReader();
 
-    const date = new Date(createdAt);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}:${month}:${year}`;
+    reader.onload = function (event) {
+      setImage(event.target.result)
+    };
+
+    reader.readAsDataURL(file);
   }
 
-  function handleMessage(recieverId) {
-    setCount((prev) => {
-      const updatedCount = { ...prev }; 
-      delete updatedCount[recieverId]; 
-  
-      localStorage.setItem("count", JSON.stringify(updatedCount));
-  
-      return updatedCount; 
-    });
-    navigate(`/message/${recieverId}`);
+  function handleImage() {
+    imageRef.current.click()
   }
 
-  useEffect(() => {
-    if (socket) {
-      socket.on('newMessage', (newMessage) => {
-          setCount((prev) => {
-            const currentCount = prev[newMessage.senderId] || 0;
-            const updatedCount = {
-              ...prev,
-              [newMessage.senderId]: currentCount + 1,
-            };
-  
-            localStorage.setItem("count", JSON.stringify(updatedCount));
-  
-            return updatedCount;
-          });
-        setNewMsg(newMessage);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm()
 
-        refetch();
-      });
+  const [createGroup, {isLoading: creatingGroup}] = useCreateGroupMutation()
 
-      return () => {
-        socket.off('newMessage');
-      };
+  async function onSubmit(data) {
+    members.push(user._id)
+    let formData = {
+      name: data.name,
+      avatar: data.avatar,
+      members
     }
-  }, [socket, refetch]);
+    try {
+      await createGroup(formData).unwrap()
+      toast.success("Group created successfully")
+      navigate("/")
+    } catch (error) {
+      toast.error(error.data.message)
+    }
+  }
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const updatedTimes = {};
-      uusers.forEach((user) => {
-        const timeSource = newMsg && newMsg.senderId === user._id
-          ? newMsg.createdAt
-          : user?.latestMessage?.createdAt;
-        updatedTimes[user._id] = getTime(timeSource);
-      });
-      setFormattedTimes(updatedTimes);
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [uusers, newMsg]);
-
+  function handleMembers(userId) {
+    setMembers((prev) => prev.includes(userId) ? prev.filter((member) => member !== userId) : [...prev, userId])
+  }
 
   return (
     <div
@@ -117,17 +81,28 @@ const Home = ({ socket }) => {
       style={{ minHeight: 'calc(100vh - 64px)' }}
     >
       <h1 className=' text-3xl font-bold pb-4'>Create New Group</h1>
+      <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
+        <div className='relative'>
+          <img className='w-28 h-28 rounded-full object-cover' src={image || user.avatar || "https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg"} alt="" />
+          <div onClick={handleImage} className='w-7 cursor-pointer h-7 flex items-center justify-center rounded-full bg-[#1A2236] absolute right-2 bottom-1 dark:bg-white'>
+            <FaCamera color='#0A80FF' className='' />
+          </div>
+        </div>
+        <div>
+          <input value={name} onChange={(e) => setName(e.target.value)} {...register("name")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' type="text" placeholder="Name" />
+        </div>
+        <input hidden {...register("avatar")} onChange={(e) => {
+          handleFileInput(e);
+          setValue("avatar", e.target.files[0]);
+        }} ref={imageRef} type="file" />
+        <button className='dark:bg-[#0A80FF] p-3 rounded-md w-80 font-semibold bg-[#0A80FF] text-white'>{creatingGroup ? <PulseLoader color='white' size={"0.5em"} /> : "Create Group"}</button>
+      </form>
       {!isLoading && Array.isArray(uusers) && uusers[0] !== null ? (
         uusers.map((user, i) => {
-          const timeSource = newMsg && newMsg.senderId === user._id
-            ? newMsg.createdAt
-            : user?.latestMessage?.createdAt;
-          const formattedTime = formattedTimes[user._id] || getTime(timeSource);
           return (
             <div
               key={i}
-              onClick={() => handleMessage(user._id)}
-              className="cursor-pointer flex w-80 justify-between items-center"
+              className="cursor-pointer flex w-80 justify-between items-center pt-6"
             >
               <div className="flex gap-3 items-center">
                 <img
@@ -140,26 +115,16 @@ const Home = ({ socket }) => {
                 />
                 <div>
                   <h2 className="font-semibold">
-                    {status === 'succeeded' ? user?.name : null}
+                    {user?.name}
                   </h2>
-                  <p className="text-sm">
-                    {newMsg && newMsg.senderId === user._id
-                      ? newMsg.message
-                      : user?.latestMessage?.message}
-                  </p>
                 </div>
               </div>
               <div className="flex gap-1 flex-col items-end">
-                <p className="text-sm text-[#0A80FF]">
-                  {status === 'succeeded' && formattedTime !== 'NaN:NaN:NaN'
-                    ? formattedTime
-                    : null}
-                </p>
-                {count[user._id] ? (
-                  <p className="bg-[#0A80FF] text-xs rounded-full w-4 h-4 flex items-center justify-center text-white">
-                    {count[user._id]}
-                  </p>
-                ) : null}
+                {!members.includes(user._id) ? <p onClick={() => handleMembers(user._id)} className="bg-[#0A80FF] text-xs rounded-full flex items-center justify-center text-white">
+                  <IoIosAdd size={"1.7em"} />
+                </p> : <p onClick={() => handleMembers(user._id)} className="bg-[#ff0a0a] text-xs rounded-full flex items-center justify-center text-white">
+                  <IoIosRemove size={"1.7em"} />
+                </p>}
               </div>
             </div>
           );
