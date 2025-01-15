@@ -4,16 +4,16 @@ import Group from "../models/group.model.js";
 import CustomError from "../utils/errorClass.js";
 import cloudinary from "../utils/cloudinary.js";
 import fs from "fs"
+import { getRecieverSocketId, io } from "../utils/socket.js";
 
 export const createGroup = catchAsyncError(async (req, res, next) => {
     try {
         let { name } = req.body
         let members = JSON.parse(req.body.members).map((member) => new mongoose.Types.ObjectId(member))
-        if(!name || !members) {
+        if (!name || !members) {
             return next(new CustomError(400, "Please provide name for group"))
         }
-        console.log(members)
-        if(members.length < 2) {
+        if (members.length < 2) {
             return next(new CustomError(400, "Please add at leat 2 members"))
         }
         let group = new Group({
@@ -46,11 +46,19 @@ export const createGroup = catchAsyncError(async (req, res, next) => {
             })
 
             group.save()
+        
+            group.members.forEach((member) => {
+                console.log(member)
+                    const memberSocketId = getRecieverSocketId(member._id);
+                    console.log(memberSocketId)
+                    if (memberSocketId) {
+                        io.to(memberSocketId).emit("newGroupCreated", req.user._id);
+                    }
+            });
 
             if (!group) {
                 return next(new CustomError(400, "Failed to create Group"))
             }
-            console.log("success")
             res.status(200).json(group)
             return
         }
@@ -66,7 +74,15 @@ export const createGroup = catchAsyncError(async (req, res, next) => {
             return next(new CustomError(400, "Failed to create Group"))
         }
 
-        console.log("success")
+        group.members.forEach((member) => {
+            console.log(member)
+                const memberSocketId = getRecieverSocketId(member._id);
+                console.log(memberSocketId)
+                if (memberSocketId) {
+                    io.to(memberSocketId).emit("newGroupCreated", req.user._id);
+                }
+        });
+
         res.status(200).json(group)
     } catch (error) {
         console.log(error)

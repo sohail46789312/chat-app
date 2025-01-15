@@ -50,7 +50,10 @@ const Message = ({ socket }) => {
     async function send() {
         const newMessage = {
             message: text,
-            senderId: user._id,
+            senderId: {
+                _id: user._id,
+                avatar: user.avatar
+            },
             recieverId
         };
         
@@ -59,20 +62,23 @@ const Message = ({ socket }) => {
         sendMessage(newMessage);
 
         setText('');
+        localStorage.setItem([newMessage.recieverId], newMessage.message)
     }
 
     useEffect(() => {
         if (socket && data?.user) {
             socket.on("newMessage", (newMessage) => {
-                if (newMessage.senderId === data.user._id) {
+                if (newMessage.senderId._id === data.user._id) {
                     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
                 }
             });
             socket.on("newGroupMessage", (newMessage) => {
-                console.log(newMessage)
-                if (data?.user?.members?.includes(newMessage.senderId)) {
+                console.log(111)
+                if (data?.user?.members?.includes(newMessage.senderId._id)) {
+                    console.log("aaa")
                     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
                 }
+                localStorage.setItem([newMessage.recieverId], newMessage.message)
             });
 
             return () => {
@@ -80,6 +86,8 @@ const Message = ({ socket }) => {
             }
         }
     }, [socket, data?.user]);
+
+    console.log(localMessages)
 
     return (
         <div style={{minHeight: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236]'>
@@ -96,8 +104,8 @@ const Message = ({ socket }) => {
                 </div>
                 <div className='flex flex-col gap-8 mt-8 dark:bg-[#1A2236] pb-20'>
                     {!isLoading && user ? localMessages.map((message, i) => (
-                        <div key={i} className={`${message.senderId === user._id ? "self-end" : "self-start"} flex gap-2`}>
-                            <img className='w-8 h-8 rounded-full' src={message.recieverId === recieverId ? data.user.avatar : user.avatar} alt="" />
+                        <div key={i} className={`${message.senderId._id === user._id ? "self-end" : "self-start"} flex gap-2`}>
+                            <img className='w-8 h-8 rounded-full' src={message.recieverId === recieverId ? message.senderId.avatar : user.avatar} alt="" />
                             <div className='flex items-center px-2 gap-2 bg-[#1A2236] dark:bg-white dark:text-black text-white rounded-md'>
                                 <p>{message.message}</p>
                                 <LiaCheckDoubleSolid color='#0A80FF' size={"1em"} />

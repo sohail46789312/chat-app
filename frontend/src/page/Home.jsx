@@ -16,6 +16,7 @@ const Home = ({ socket }) => {
   const [newMsg, setNewMsg] = useState(null);
 
   const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
+    const { user  } = useSelector((state) => state.auth)
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -88,11 +89,12 @@ const Home = ({ socket }) => {
           });
         setNewMsg(newMessage);
 
-        if (!isLoading && !isError) {
+        if (!isLoading && !isError && refetch) {
           refetch();
         }
       });
       socket.on('newGroupMessage', (newMessage) => {
+        console.log(newMessage)
           setCount((prev) => {
             const currentCount = prev[newMessage.recieverId] || 0;
             const updatedCount = {
@@ -105,10 +107,15 @@ const Home = ({ socket }) => {
             return updatedCount;
           });
           localStorage.setItem([newMessage.recieverId], newMessage.message)
-          if (!isLoading && !isError) {
+          if (!isLoading && !isError && refetch) {
             refetch();
           }
       });
+      socket.on("newGroupCreated", (id) => {
+        if(!isLoading && !isError && refetch){
+          refetch();
+        }
+      })
 
       return () => {
         socket.off('newMessage');
@@ -131,6 +138,9 @@ const Home = ({ socket }) => {
     return () => clearInterval(interval);
   }, [uusers, newMsg]);
 
+  if (!isLoading && !isError && refetch) {
+    console.log("Calling refetch...");
+  }
 
   return (
     <div

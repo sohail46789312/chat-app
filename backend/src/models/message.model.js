@@ -8,10 +8,12 @@ const messageSchema = new mongoose.Schema({
         type: String
     },
     senderId: {
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
     },
     recieverId: {
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
     },
     isGroup: {
         type: Boolean,

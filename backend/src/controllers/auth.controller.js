@@ -334,7 +334,7 @@ export const usersWithMessage = catchAsyncError(async (req, res, next) => {
 
         let users = await User.find()
 
-        async function func() {
+        async function userLatestMessage() {
             for (const user of users) {
                 let latestMessageFilter = messages.filter(m => m.senderId.toString() === user._id.toString() || m.recieverId.toString() === user._id.toString())
                 let latestM = latestMessageFilter.pop()
@@ -342,9 +342,8 @@ export const usersWithMessage = catchAsyncError(async (req, res, next) => {
                 await user.save()
             }
         }
-        await func()
+        await userLatestMessage()
 
-        users = await User.find()
         let groups = await Group.find({ members: req.user._id })
 
         const sortedUsers = users.sort((a, b) =>

@@ -9,6 +9,7 @@ import { IoIosAdd, IoIosRemove } from 'react-icons/io';
 import { useForm } from 'react-hook-form';
 import { FaCamera } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import Compressor from 'compressorjs';
 
 const Home = ({ socket }) => {
   const { users, status } = useSelector((state) => state.message);
@@ -53,22 +54,36 @@ const Home = ({ socket }) => {
     formState: { errors }
   } = useForm()
 
-  const [createGroup, {isLoading: creatingGroup}] = useCreateGroupMutation()
+  const [createGroup, { isLoading: creatingGroup }] = useCreateGroupMutation()
 
   async function onSubmit(data) {
-    members.push(user._id)
+    members.push(user._id);
+
+    let compressedAvatar
+    if(data.avatar){
+      compressedAvatar = await new Promise((resolve, reject) => {
+      new Compressor(data.avatar, {
+        maxWidth: 200,
+        maxHeight: 200,
+        success(result) {
+          resolve(result);
+        },
+        error(err) {
+          reject(err);
+        },
+      });
+    });
+    }
+
     let formData = {
       name: data.name,
-      avatar: data.avatar,
-      members
-    }
-    try {
-      await createGroup(formData).unwrap()
-      toast.success("Group created successfully")
-      navigate("/")
-    } catch (error) {
-      toast.error(error.data.message)
-    }
+      avatar: compressedAvatar,
+      members,
+    };
+
+    await createGroup(formData).unwrap();
+    toast.success('Group created successfully');
+    navigate('/');
   }
 
   function handleMembers(userId) {
@@ -83,7 +98,7 @@ const Home = ({ socket }) => {
       <h1 className=' text-3xl font-bold pb-4'>Create New Group</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div className='relative'>
-          <img className='w-28 h-28 rounded-full object-cover' src={image || user.avatar || "https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg"} alt="" />
+          <img className='w-28 h-28 rounded-full object-cover' src={image || "https://res.cloudinary.com/dioj83hyt/image/upload/v1736923059/deafult%20group%20avatar.jpg"} alt="" />
           <div onClick={handleImage} className='w-7 cursor-pointer h-7 flex items-center justify-center rounded-full bg-[#1A2236] absolute right-2 bottom-1 dark:bg-white'>
             <FaCamera color='#0A80FF' className='' />
           </div>

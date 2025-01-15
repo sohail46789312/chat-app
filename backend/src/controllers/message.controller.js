@@ -61,6 +61,8 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
 
         await message.save()
 
+        message = await Message.findById(message._id).populate("senderId", "avatar")
+
         let group = await Group.findById(recieverId)
 
         if (group) {
@@ -78,7 +80,7 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
             });
         
             group.members.forEach((member) => {
-                if (member._id.toString() !== message.senderId.toString()) {
+                if (member._id.toString() !== message.senderId._id.toString()) {
                     const memberSocketId = getRecieverSocketId(member._id);
                     if (memberSocketId) {
                         io.to(memberSocketId).emit("newGroupMessage", message);
@@ -90,7 +92,6 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
         }
         
         const recieverSocketId = getRecieverSocketId(recieverId)
-        console.log(recieverSocketId)
         if (recieverSocketId) {
             io.to(recieverSocketId).emit("newMessage", message)
         }
@@ -109,7 +110,7 @@ export const getMessage = catchAsyncError(async (req, res, next) => {
         let user = await User.findById(req.params.recieverId)
         let group = await Group.findById(req.params.recieverId)
         if(!user) {
-            messages = await Message.find({recieverId: req.params.recieverId})
+            messages = await Message.find({recieverId: req.params.recieverId}).populate("senderId", "avatar")
             res.status(200).json({ messages, user: group })
             return
         }

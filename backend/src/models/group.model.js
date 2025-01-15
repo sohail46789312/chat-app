@@ -8,7 +8,7 @@ const groupSchema = new mongoose.Schema(
         },
         avatar: {
             type: String,
-            default: "https://res.cloudinary.com/dioj83hyt/image/upload/v1736405698/default%20avatar.jpg"
+            default: "https://res.cloudinary.com/dioj83hyt/image/upload/v1736923059/deafult%20group%20avatar.jpg"
         },
         latestMessage: {
             type: Object,

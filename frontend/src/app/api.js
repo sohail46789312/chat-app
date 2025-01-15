@@ -45,7 +45,7 @@ export const api = createApi({
                 formData.append("members", JSON.stringify(data.members))
 
                 return {
-                    url:`/group/create`,
+                    url: `/group/create`,
                     method: "POST",
                     body: formData,
                     credentials: "include"
