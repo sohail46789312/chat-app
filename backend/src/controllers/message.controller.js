@@ -74,7 +74,6 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
                     const socket = io.sockets.sockets.get(memberSocketId);
                     if (socket) {
                         socket.join(roomId);
-                        console.log(`User ${member._id} added to room: ${roomId}`);
                     }
                 }
             });
@@ -120,7 +119,7 @@ export const getMessage = catchAsyncError(async (req, res, next) => {
                 { recieverId: req.params.recieverId, senderId: req.user._id },
                 { recieverId: req.user._id, senderId: req.params.recieverId }
             ]
-        });
+        }).populate("senderId", "avatar").populate("recieverId", "avatar")
 
         res.status(200).json({ messages, user })
     } catch (error) {

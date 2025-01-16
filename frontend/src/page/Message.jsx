@@ -73,9 +73,7 @@ const Message = ({ socket }) => {
                 }
             });
             socket.on("newGroupMessage", (newMessage) => {
-                console.log(111)
-                if (data?.user?.members?.includes(newMessage.senderId._id)) {
-                    console.log("aaa")
+                if (newMessage.recieverId === data.user._id) {
                     setLocalMessages((prevMessages) => [...prevMessages, newMessage]);
                 }
                 localStorage.setItem([newMessage.recieverId], newMessage.message)
@@ -87,7 +85,6 @@ const Message = ({ socket }) => {
         }
     }, [socket, data?.user]);
 
-    console.log(localMessages)
 
     return (
         <div style={{minHeight: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236]'>
@@ -105,7 +102,7 @@ const Message = ({ socket }) => {
                 <div className='flex flex-col gap-8 mt-8 dark:bg-[#1A2236] pb-20'>
                     {!isLoading && user ? localMessages.map((message, i) => (
                         <div key={i} className={`${message.senderId._id === user._id ? "self-end" : "self-start"} flex gap-2`}>
-                            <img className='w-8 h-8 rounded-full' src={message.recieverId === recieverId ? message.senderId.avatar : user.avatar} alt="" />
+                            <img className='w-8 h-8 rounded-full' src={message.senderId.avatar} alt="" />
                             <div className='flex items-center px-2 gap-2 bg-[#1A2236] dark:bg-white dark:text-black text-white rounded-md'>
                                 <p>{message.message}</p>
                                 <LiaCheckDoubleSolid color='#0A80FF' size={"1em"} />
@@ -115,7 +112,6 @@ const Message = ({ socket }) => {
                     <div ref={scrollRef}></div>
                 </div>
                 <div className='fixed bottom-0 pb-4 pt-2 flex w-80 items-center gap-2 dark:bg-[#1A2236] bg-white'>
-                    <MdEmojiEmotions className='cursor-pointer' color='#0A80FF' size={"1.5em"} />
                     <input
                         onChange={handleMessage}
                         value={text}

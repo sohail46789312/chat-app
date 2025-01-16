@@ -23,8 +23,6 @@ const Signup = () => {
   const email = watch("email")
   const password = watch("password")
 
-  console.log(password)
-
   let formData = {
     name,
     email,

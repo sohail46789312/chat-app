@@ -6,7 +6,6 @@ import { PulseLoader } from 'react-spinners';
 import { useUsersWithMessagesQuery } from '../app/api';
 
 const Home = ({ socket }) => {
-  const { users, status } = useSelector((state) => state.message);
   const [formattedTimes, setFormattedTimes] = useState({});
   const [uusers, setUsers] = useState([]);
   const [count, setCount] = useState(() => {
@@ -15,11 +14,13 @@ const Home = ({ socket }) => {
   });
   const [newMsg, setNewMsg] = useState(null);
 
-  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
-    const { user  } = useSelector((state) => state.auth)
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { users, status } = useSelector((state) => state.message);
+  const { user } = useSelector((state) => state.auth)
+
+  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
 
   useEffect(() => {
     if (!isLoading && !isError) {
@@ -37,6 +38,72 @@ const Home = ({ socket }) => {
   useEffect(() => {
     setUsers(users);
   }, [users]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('newMessage', (newMessage) => {
+        setCount((prev) => {
+          const currentCount = prev[newMessage.senderId._id] || 0;
+          const updatedCount = {
+            ...prev,
+            [newMessage.senderId._id]: currentCount + 1,
+          };
+
+          localStorage.setItem("count", JSON.stringify(updatedCount));
+
+          return updatedCount;
+        });
+        setNewMsg(newMessage);
+
+        if (!isLoading && !isError && refetch) {
+          refetch();
+        }
+      });
+      
+      socket.on('newGroupMessage', (newMessage) => {
+        setCount((prev) => {
+          const currentCount = prev[newMessage.recieverId] || 0;
+          const updatedCount = {
+            ...prev,
+            [newMessage.recieverId]: currentCount + 1,
+          };
+
+          localStorage.setItem("count", JSON.stringify(updatedCount));
+
+          return updatedCount;
+        });
+        localStorage.setItem([newMessage.recieverId], newMessage.message)
+        if (!isLoading && !isError && refetch) {
+          refetch();
+        }
+      });
+
+      socket.on("newGroupCreated", (id) => {
+          refetch();
+      })
+
+      return () => {
+        socket.off('newMessage');
+        socket.off('newGroupMessage');
+        socket.off("newGroupCreated");
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedTimes = {};
+      uusers.forEach((user) => {
+        const timeSource = newMsg && newMsg.senderId === user._id
+          ? newMsg.createdAt
+          : user?.latestMessage?.createdAt;
+        updatedTimes[user._id] = getTime(timeSource);
+      });
+      setFormattedTimes(updatedTimes);
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, [uusers, newMsg]);
 
   function getTime(createdAt) {
     const now = new Date();
@@ -63,83 +130,14 @@ const Home = ({ socket }) => {
 
   function handleMessage(recieverId) {
     setCount((prev) => {
-      const updatedCount = { ...prev }; 
-      delete updatedCount[recieverId]; 
-  
+      const updatedCount = { ...prev };
+      delete updatedCount[recieverId];
+
       localStorage.setItem("count", JSON.stringify(updatedCount));
-  
-      return updatedCount; 
+
+      return updatedCount;
     });
     navigate(`/message/${recieverId}`);
-  }
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('newMessage', (newMessage) => {
-          setCount((prev) => {
-            const currentCount = prev[newMessage.senderId] || 0;
-            const updatedCount = {
-              ...prev,
-              [newMessage.senderId]: currentCount + 1,
-            };
-  
-            localStorage.setItem("count", JSON.stringify(updatedCount));
-  
-            return updatedCount;
-          });
-        setNewMsg(newMessage);
-
-        if (!isLoading && !isError && refetch) {
-          refetch();
-        }
-      });
-      socket.on('newGroupMessage', (newMessage) => {
-        console.log(newMessage)
-          setCount((prev) => {
-            const currentCount = prev[newMessage.recieverId] || 0;
-            const updatedCount = {
-              ...prev,
-              [newMessage.recieverId]: currentCount + 1,
-            };
-  
-            localStorage.setItem("count", JSON.stringify(updatedCount));
-  
-            return updatedCount;
-          });
-          localStorage.setItem([newMessage.recieverId], newMessage.message)
-          if (!isLoading && !isError && refetch) {
-            refetch();
-          }
-      });
-      socket.on("newGroupCreated", (id) => {
-        if(!isLoading && !isError && refetch){
-          refetch();
-        }
-      })
-
-      return () => {
-        socket.off('newMessage');
-      };
-    }
-  }, [socket, refetch]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const updatedTimes = {};
-      uusers.forEach((user) => {
-        const timeSource = newMsg && newMsg.senderId === user._id
-          ? newMsg.createdAt
-          : user?.latestMessage?.createdAt;
-        updatedTimes[user._id] = getTime(timeSource);
-      });
-      setFormattedTimes(updatedTimes);
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [uusers, newMsg]);
-
-  if (!isLoading && !isError && refetch) {
-    console.log("Calling refetch...");
   }
 
   return (
@@ -173,7 +171,7 @@ const Home = ({ socket }) => {
                     {status === 'succeeded' ? user?.name : null}
                   </h2>
                   <p className="text-sm">
-                    {newMsg && newMsg.senderId === user._id
+                    {newMsg && newMsg.senderId._id === user._id
                       ? (newMsg.message)
                       : (localStorage.getItem(user._id) ? localStorage.getItem(user._id) : user?.latestMessage?.message)}
                   </p>

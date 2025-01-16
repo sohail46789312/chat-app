@@ -48,9 +48,7 @@ export const createGroup = catchAsyncError(async (req, res, next) => {
             group.save()
         
             group.members.forEach((member) => {
-                console.log(member)
                     const memberSocketId = getRecieverSocketId(member._id);
-                    console.log(memberSocketId)
                     if (memberSocketId) {
                         io.to(memberSocketId).emit("newGroupCreated", req.user._id);
                     }
@@ -75,9 +73,7 @@ export const createGroup = catchAsyncError(async (req, res, next) => {
         }
 
         group.members.forEach((member) => {
-            console.log(member)
                 const memberSocketId = getRecieverSocketId(member._id);
-                console.log(memberSocketId)
                 if (memberSocketId) {
                     io.to(memberSocketId).emit("newGroupCreated", req.user._id);
                 }

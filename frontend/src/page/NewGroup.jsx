@@ -60,19 +60,19 @@ const Home = ({ socket }) => {
     members.push(user._id);
 
     let compressedAvatar
-    if(data.avatar){
+    if (data.avatar) {
       compressedAvatar = await new Promise((resolve, reject) => {
-      new Compressor(data.avatar, {
-        maxWidth: 200,
-        maxHeight: 200,
-        success(result) {
-          resolve(result);
-        },
-        error(err) {
-          reject(err);
-        },
+        new Compressor(data.avatar, {
+          maxWidth: 200,
+          maxHeight: 200,
+          success(result) {
+            resolve(result);
+          },
+          error(err) {
+            reject(err);
+          },
+        });
       });
-    });
     }
 
     let formData = {
@@ -114,6 +114,9 @@ const Home = ({ socket }) => {
       </form>
       {!isLoading && Array.isArray(uusers) && uusers[0] !== null ? (
         uusers.map((user, i) => {
+          if (user.members) {
+            return null
+          }
           return (
             <div
               key={i}
@@ -142,14 +145,10 @@ const Home = ({ socket }) => {
                 </p>}
               </div>
             </div>
-          );
+          )
         })
       ) : (
-        <PulseLoader
-          style={{ position: 'absolute', bottom: '50%' }}
-          color="#0A80FF"
-          size="1em"
-        />
+        null
       )}
     </div>
   );

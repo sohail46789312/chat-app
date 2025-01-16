@@ -79,7 +79,7 @@ const Header = () => {
         <div className='flex items-center gap-3'>
           <div className='cursor-pointer select-none' onClick={handleClick}>{mode ? <MdOutlineLightMode color='#0A80FF' size={"1.5em"} /> : (mode === null ? <MdOutlineLightMode color='#0A80FF' size={"1.5em"} />: <MdDarkMode color='#0A80FF' size={"1.5em"} />)}</div>
           {!user ? null : <IoIosSearch className='cursor-pointer select-none' onClick={handleSearch} color='#0A80FF' size={"1.5em"} />}
-          {!user ? null : <img onClick={handleProfile} className='w-[1.5em] cursor-pointer rounded-full' src={user.avatar} />}
+          {!user ? null : <img onClick={handleProfile} className='w-[1.5em] h-[1.5em] object-cover cursor-pointer rounded-full' src={user.avatar} />}
         </div>
         {show ? <div className='flex flex-col gap-1 border-[1px] rounded-md py-2 pl-2 absolute z-10 right-5 top-12 bg-[#0A80FF] text-white shadow-md w-28'>
           <Link onClick={() => setShow(false)} to={"/newgroup"} className='cursor-pointer'>New Group</Link>
