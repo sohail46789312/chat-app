@@ -89,7 +89,7 @@ const App = () => {
           element: <>{!user ? <ForgotPassword /> : <Navigate to="/" />}</>
         },
         {
-          path: "/resetpassword",
+          path: "/resetpassword/:token",
           element: <>{!user ? <ResetPassword /> : <Navigate to="/" />}</>
         },
         {

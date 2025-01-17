@@ -5,7 +5,8 @@ const messageSchema = new mongoose.Schema({
         type: String
     },
     file: {
-        type: String
+        secure_url: String,
+        resource_type: String
     },
     senderId: {
         type: mongoose.Schema.Types.ObjectId,

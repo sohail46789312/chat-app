@@ -55,9 +55,7 @@ const Home = ({ socket }) => {
         });
         setNewMsg(newMessage);
 
-        if (!isLoading && !isError && refetch) {
           refetch();
-        }
       });
       
       socket.on('newGroupMessage', (newMessage) => {
@@ -73,9 +71,7 @@ const Home = ({ socket }) => {
           return updatedCount;
         });
         localStorage.setItem([newMessage.recieverId], newMessage.message)
-        if (!isLoading && !isError && refetch) {
           refetch();
-        }
       });
 
       socket.on("newGroupCreated", (id) => {
@@ -170,7 +166,7 @@ const Home = ({ socket }) => {
                   <h2 className="font-semibold">
                     {status === 'succeeded' ? user?.name : null}
                   </h2>
-                  <p className="text-sm">
+                  <p className="text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[28vw]">
                     {newMsg && newMsg.senderId._id === user._id
                       ? (newMsg.message)
                       : (localStorage.getItem(user._id) ? localStorage.getItem(user._id) : user?.latestMessage?.message)}

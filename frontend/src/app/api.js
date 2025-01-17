@@ -14,6 +14,7 @@ export const api = createApi({
                 let formData = new FormData()
 
                 formData.append("message", data.message)
+                formData.append("file", data.file)
 
                 return {
                     url: `/message/create/${data.recieverId}`,

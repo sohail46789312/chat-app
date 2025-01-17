@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { FaCamera, FaFacebook, FaGoogle } from "react-icons/fa";
 import { useForm } from 'react-hook-form';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { changePassword, google, resetPassword, signin, updateProfile } from '../features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { PulseLoader } from 'react-spinners';
@@ -22,9 +22,10 @@ const ResetPassword = () => {
         formState: { errors }
     } = useForm()
 
-    let token = watch("token")
     let newPassword = watch("newPassword")
     let confirmPassword = watch("confirmPassword")
+    let { token } = useParams("token")
+
 
     function onSubmit() {
         dispatch(resetPassword({ token, newPassword, confirmPassword }))
@@ -35,14 +36,11 @@ const ResetPassword = () => {
             <h1 className=' text-3xl font-bold'>Reset Password</h1>
             <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
                 <div className='relative'>
-                    <input value={token} {...register("token")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="Token" />
-                </div>
-                <div className='relative'>
-                    <input value={newPassword} onChange={(e) => setNewPassword(e.target.value)} type={showNewPassword ? "text" : "password"} {...register("newPassword")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="New Passsword" />
+                    <input type={showNewPassword ? "text" : "password"} {...register("newPassword", { required: "New Password is required" })} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="New Passsword" />
                     {newPassword ? (showNewPassword ? <GoEyeClosed onClick={() => setShowNewPassword(!showNewPassword)} className='select-none absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowNewPassword(!showNewPassword)} className='select-none absolute right-3 top-[18px]' />) : null}
                 </div>
                 <div className='relative'>
-                    <input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type={showConfirmPassword ? "text" : "password"} {...register("confirmPassword")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="Confirm Password" />
+                    <input type={showConfirmPassword ? "text" : "password"} {...register("confirmPassword", { required: "New Password is required" })} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="Confirm Password" />
                     {confirmPassword ? (showConfirmPassword ? <GoEyeClosed onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='select-none absolute right-3 top-[18px]' /> : <RxEyeOpen onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='select-none absolute right-3 top-[18px]' />) : null}
                 </div>
                 <p className='text-red-500'>{error?.message}</p>

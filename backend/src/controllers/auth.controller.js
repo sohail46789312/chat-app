@@ -241,12 +241,12 @@ export const forgotPassword = catchAsyncError(async (req, res, next) => {
 
         await user.save()
 
-        const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/ /${resetPasswordToken}`;
+        const resetUrl = `http://localhost:5173/resetpassword/${resetPasswordToken}`;
         const message = `Your password reset token is as follow:\n\n${resetUrl}\n\nIf you have not requested this email, then ignore it.`
 
         await sendMail({
             email: user.email,
-            subject: 'Express Blog Password Recovery',
+            subject: 'Chat app Password Recovery',
             message
         })
         res.status(200).json({
@@ -265,6 +265,7 @@ export const forgotPassword = catchAsyncError(async (req, res, next) => {
 })
 
 export const resetPassword = catchAsyncError(async (req, res, next) => {
+    console.log(req.body)
     let user
     try {
         const user = await User.findOne({
