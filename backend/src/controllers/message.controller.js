@@ -24,7 +24,6 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
         let message
 
         if (req.file) {
-            console.log(req.file)
 
             let result = await cloudinary.uploader.upload(req.file.path, {
                 resource_type: "auto",
@@ -32,7 +31,6 @@ export const createMessage = catchAsyncError(async (req, res, next) => {
                 public_id: senderId
             })
 
-            console.log(result)
 
             if (!result) {
                 return next(new CustomError(400, "Failed to upload to cloudinary."))

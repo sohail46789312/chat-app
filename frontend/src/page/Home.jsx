@@ -18,7 +18,6 @@ const Home = ({ socket }) => {
   const dispatch = useDispatch();
 
   const { users, status } = useSelector((state) => state.message);
-  const { user } = useSelector((state) => state.auth)
 
   const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
 
@@ -55,9 +54,9 @@ const Home = ({ socket }) => {
         });
         setNewMsg(newMessage);
 
-          refetch();
+        refetch();
       });
-      
+
       socket.on('newGroupMessage', (newMessage) => {
         setCount((prev) => {
           const currentCount = prev[newMessage.recieverId] || 0;
@@ -71,11 +70,11 @@ const Home = ({ socket }) => {
           return updatedCount;
         });
         localStorage.setItem([newMessage.recieverId], newMessage.message)
-          refetch();
+        refetch();
       });
 
       socket.on("newGroupCreated", (id) => {
-          refetch();
+        refetch();
       })
 
       return () => {
@@ -143,7 +142,7 @@ const Home = ({ socket }) => {
     >
       {!isLoading && Array.isArray(uusers) && uusers[0] !== null ? (
         uusers.map((user, i) => {
-          const timeSource = newMsg && newMsg.senderId === user._id
+          const timeSource = newMsg && newMsg.senderId._id === user._id
             ? newMsg.createdAt
             : user?.latestMessage?.createdAt;
           const formattedTime = formattedTimes[user._id] || getTime(timeSource);
@@ -160,7 +159,7 @@ const Home = ({ socket }) => {
                     user?.avatar ||
                     'https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg'
                   }
-                  alt=""
+                  alt="jjj"
                 />
                 <div>
                   <h2 className="font-semibold">

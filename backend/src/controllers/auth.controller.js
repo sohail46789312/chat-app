@@ -306,18 +306,9 @@ export const getUsers = catchAsyncError(async (req, res, next) => {
     try {
         let user = await User.find({ email: { $regex: req.query.keyword, $options: "i" } })
 
-        let message = await Message.find({
-            $or: [
-                { recieverId: user?._id, senderId: req.user._id },
-                { recieverId: req.user._id, senderId: user?._id }
-            ]
-        });
-
         let usersWithoutMe = user.filter(user => user._id.toString() !== req.user._id.toString())
 
-        let latestMessage = message.pop()
-
-        res.status(200).json({ user: usersWithoutMe, latestMessage })
+        res.status(200).json({ user: usersWithoutMe })
     } catch (error) {
         console.log("error in getUsers controller", error)
         return next(new CustomError(500, error.message))

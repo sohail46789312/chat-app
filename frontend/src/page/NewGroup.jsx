@@ -124,7 +124,7 @@ const Home = ({ socket }) => {
             >
               <div className="flex gap-3 items-center">
                 <img
-                  className="w-14 h-14 rounded-full"
+                  className="w-14 h-14 object-cover rounded-full"
                   src={
                     user?.avatar ||
                     'https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg'

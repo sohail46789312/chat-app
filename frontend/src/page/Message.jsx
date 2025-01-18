@@ -219,13 +219,11 @@ const Message = ({ socket }) => {
                             ref={audioRef}
                             type="file"
                         />
-                        <input ref={fileRef} type="file" />
                     </div>
                     <div className={`${showAttachmentBox ? "flex" : "hidden"} flex-col gap-1 border-[1px] rounded-md py-2 absolute z-10 right-7 bottom-20 bg-[#0A80FF] text-white shadow-md w-28`}>
                         <p onClick={handleImage} className='hover:bg-[#0a60bd] pl-2 cursor-pointer'>Image</p>
                         <p onClick={handleVideo} className='hover:bg-[#0a60bd] pl-2 cursor-pointer'>Video</p>
                         <p onClick={handleAudio} className='hover:bg-[#0a60bd] pl-2 cursor-pointer'>Audio</p>
-                        <p onClick={handleFile} className='hover:bg-[#0a60bd] pl-2 cursor-pointer'>File</p>
                     </div>
                     <IoIosAttach onClick={handleAttachmentBox} className='select-none cursor-pointer' color='#0A80FF' size={"1.5em"} />
                     <IoMdSend className='cursor-pointer' onClick={send} color='#0A80FF' size={"1.5em"} />

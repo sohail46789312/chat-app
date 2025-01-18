@@ -9,6 +9,7 @@ import { PulseLoader } from 'react-spinners'
 import { Link } from "react-router-dom"
 import { getUsers, usersWithMessage } from '../features/messageSlice'
 import { IoCloseOutline } from 'react-icons/io5'
+import { useUsersWithMessagesQuery } from '../app/api'
 
 const Header = () => {
   let { message, users, prevUsers, errro } = useSelector((state) => state.message)
@@ -16,6 +17,7 @@ const Header = () => {
   const [mode, setMode] = useState(localStorage.getItem("theme") === "dark" ? true : (localStorage.getItem("theme") === null ? null : false))
   const [show, setShow] = useState(false)
   const [search, setSearch] = useState(false)
+  const [searchText, setSearchText] = useState("")
   const { user, status, error } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
 
@@ -56,15 +58,29 @@ const Header = () => {
     fetchUserData()
   }
 
+  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
+
   function handleQuery(e) {
-    if (e.target.value === "") {
-      dispatch(usersWithMessage(prevUsers))
-    } else {
-      dispatch(getUsers(e.target.value))
-    }
+    setSearchText(e.target.value)
+    // if (searchText === "") {
+    //   refetch()
+    // } else {
+    //   dispatch(getUsers(searchText))
+    // }
   }
 
+  useEffect(() => {
+    if (searchText === "") {
+      refetch()
+    } else {
+      dispatch(getUsers(searchText))
+    }
+  }, [searchText])
+
+  // console.log(searchText)
+
   function handleSearch() {
+    setSearchText("")
     setSearch(!search)
   }
 
@@ -72,7 +88,7 @@ const Header = () => {
     <div>
       <nav className="dark:bg-[#1A2236] relative h-16 dark:text-[#C6C8CD] flex justify-between items-center px-4 border-b-[1px] dark:border-white/10 border-black/30">
         <div className='absolute '>
-          <input onChange={handleQuery} className={`${search ? "block" : "hidden"} dark:bg-[#1A2236] bg-white p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60`} type="text" placeholder='Search' />
+          <input value={searchText} onChange={handleQuery} className={`${search ? "block" : "hidden"} dark:bg-[#1A2236] bg-white p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60`} type="text" placeholder='Search' />
           <IoCloseOutline onClick={handleSearch} className='absolute cursor-pointer right-3 top-[14px]' color='#0A80FF' size={"1.5em"} />
         </div>
         <h2 onClick={() => navigate("/")} className='text-xl font-bold cursor-pointer'>Chat</h2>

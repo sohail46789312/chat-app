@@ -5,6 +5,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { google, signin, updateProfile } from '../features/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { PulseLoader } from 'react-spinners';
+import Compressor from 'compressorjs';
 
 const Profile = () => {
   const dispatch = useDispatch()
@@ -38,11 +39,27 @@ const Profile = () => {
     formState: { errors }
   } = useForm()
 
-  function onSubmit(data) {
+  async function onSubmit(data) {
+    let compressedAvatar
+    if (data.avatar) {
+      compressedAvatar = await new Promise((resolve, reject) => {
+        new Compressor(data.avatar, {
+          maxWidth: 200,
+          maxHeight: 200,
+          success(result) {
+            resolve(result);
+          },
+          error(err) {
+            reject(err);
+          },
+        });
+      });
+    }
+
     let formData = {
       name: data.name || user.name,
       email: data.email || user.email,
-      avatar: data.avatar
+      avatar: compressedAvatar
     }
     dispatch(updateProfile(formData))
   }
@@ -52,7 +69,7 @@ const Profile = () => {
       <h1 className=' text-3xl font-bold'>Profile</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div className='relative'>
-          <img className='w-28 h-28 rounded-full' src={image || user.avatar || "https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg"} alt="" />
+          <img className='w-28 h-28 object-cover rounded-full' src={image || user.avatar || "https://res.cloudinary.com/dioj83hyt/image/upload/v1734679232/Chat/if7zp2afhfxbnmk2vrvz.jpg"} alt="" />
           <div onClick={handleImage} className='w-7 cursor-pointer h-7 flex items-center justify-center rounded-full bg-[#1A2236] absolute right-2 bottom-1 dark:bg-white'>
             <FaCamera color='#0A80FF' className='' />
           </div>
