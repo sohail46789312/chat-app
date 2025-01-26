@@ -15,11 +15,13 @@ import Message from './page/Message'
 import { getUser } from './features/authSlice'
 import io from "socket.io-client"
 import { Toaster } from 'react-hot-toast'
+import Video from './page/Video'
 
 const App = () => {
+  const dispatch = useDispatch()
+
   const [loading, setLoading] = useState(true)
   const [socket, setSocket] = useState(null)
-  const dispatch = useDispatch()
 
   const { user, status } = useSelector((state) => state.auth)
 
@@ -63,6 +65,10 @@ const App = () => {
         {
           path: "/",
           element: <>{user && socket ? <Home socket={socket} /> : <Navigate to="/signin" />}</>
+        },
+        {
+          path: "/video",
+          element: <>{user && socket ? <Video socket={socket} /> : <Navigate to="/signin" />}</>
         },
         {
           path: "/newgroup",

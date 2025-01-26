@@ -20,6 +20,31 @@ const userSocketMap = {}
 io.on("connection", (socket) => {
     console.log("a user connected", socket.id)
 
+    socket.emit("me", socket.id)
+
+    socket.on("callToUser", (data) => {
+        let userSocketId = getRecieverSocketId(data.callToUserId)
+        if(userSocketId){
+            io.to(userSocketId).emit("calling", {
+                signal: data.signalData,
+                from: data.from,
+                name: data.name
+            })
+        }
+    })
+
+    socket.on("rejectcall", (data) => {
+        io.to(data.to).emit("callrejected", {name: data.name})
+    })
+
+    socket.on("callaccepted", (data) => {
+        io.to(data.to).emit("acceptsignal", { signal: data.signal, from: data.from })
+    })
+
+    socket.on("callended", (data) => {
+        io.to(data.to).emit("callended", {name: data.name})
+    })
+
     const userId = socket.handshake.query.userId
 
     if(userId) userSocketMap[userId] = socket.id
@@ -29,6 +54,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         console.log("a user disconnected", socket.id)
         delete userSocketMap[userId]
+
         io.emit("getOnlineUsers", Object.keys(userSocketMap))
     })
 })

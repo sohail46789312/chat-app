@@ -12,24 +12,34 @@ import toast from 'react-hot-toast';
 import Compressor from 'compressorjs';
 
 const Home = ({ socket }) => {
-  const { users, status } = useSelector((state) => state.message);
-  const [uusers, setUsers] = useState([]);
-  const [members, setMembers] = useState([]);
+  const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
-
-  useEffect(() => {
-    setUsers(users);
-  }, [users]);
-
-  const dispatch = useDispatch()
-  let { user, error } = useSelector((state) => state.auth)
+  const [uusers, setUsers] = useState([]);
+  const [members, setMembers] = useState([]);
   const [name, setName] = useState()
   const [email, setEmail] = useState()
   const [image, setImage] = useState()
 
   const imageRef = useRef(null)
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm()
+
+  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
+  const [createGroup, { isLoading: creatingGroup }] = useCreateGroupMutation()
+
+  const { users, status } = useSelector((state) => state.message);
+  let { user, error } = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    setUsers(users);
+  }, [users]);
 
   function handleFileInput(e) {
     let file = e.target.files[0];
@@ -45,16 +55,6 @@ const Home = ({ socket }) => {
   function handleImage() {
     imageRef.current.click()
   }
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useForm()
-
-  const [createGroup, { isLoading: creatingGroup }] = useCreateGroupMutation()
 
   async function onSubmit(data) {
     members.push(user._id);

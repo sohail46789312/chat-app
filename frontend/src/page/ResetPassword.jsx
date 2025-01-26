@@ -10,9 +10,9 @@ import { RxEyeOpen } from 'react-icons/rx';
 
 const ResetPassword = () => {
     const dispatch = useDispatch()
+
     const [showNewPassword, setShowNewPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    let { user, status, error } = useSelector((state) => state.auth)
 
     const {
         register,
@@ -26,6 +26,7 @@ const ResetPassword = () => {
     let confirmPassword = watch("confirmPassword")
     let { token } = useParams("token")
 
+    let { user, status, error } = useSelector((state) => state.auth)
 
     function onSubmit() {
         dispatch(resetPassword({ token, newPassword, confirmPassword }))

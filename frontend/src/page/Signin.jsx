@@ -9,10 +9,11 @@ import { GoEyeClosed } from 'react-icons/go';
 import { RxEyeOpen } from 'react-icons/rx';
 
 const Signin = () => {
-  const [pass, setPass] = useState(true)
-  const navigate = useNavigate()
-  const { user, status, error } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const [pass, setPass] = useState(true)
+
   const {
     register,
     handleSubmit,
@@ -28,16 +29,18 @@ const Signin = () => {
     password
   }
 
+  const { user, status, error } = useSelector((state) => state.auth)
+
   function onSubmit(data) {
-      dispatch(signin(formData))
+    dispatch(signin(formData))
   }
 
-  function handleGoogle () {
-      dispatch(google())
+  function handleGoogle() {
+    dispatch(google())
   }
 
   return (
-    <div style={{minHeight: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236] bg-white dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
+    <div style={{ minHeight: "calc(100vh - 64px)" }} className='dark:bg-[#1A2236] bg-white dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
       <h1 className=' text-3xl font-bold'>Sign In</h1>
       <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
         <div>

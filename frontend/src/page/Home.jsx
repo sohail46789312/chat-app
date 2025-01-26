@@ -6,6 +6,9 @@ import { PulseLoader } from 'react-spinners';
 import { useUsersWithMessagesQuery } from '../app/api';
 
 const Home = ({ socket }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [formattedTimes, setFormattedTimes] = useState({});
   const [uusers, setUsers] = useState([]);
   const [count, setCount] = useState(() => {
@@ -14,12 +17,9 @@ const Home = ({ socket }) => {
   });
   const [newMsg, setNewMsg] = useState(null);
 
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
 
   const { users, status } = useSelector((state) => state.message);
-
-  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
 
   useEffect(() => {
     if (!isLoading && !isError) {

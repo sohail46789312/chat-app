@@ -14,13 +14,11 @@ import { GoEyeClosed } from "react-icons/go";
 import { RxEyeOpen } from "react-icons/rx";
 
 const ChangePassword = () => {
+    const dispatch = useDispatch();
+
     const [showOldPassword, setShowOldPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-    const dispatch = useDispatch();
-
-    let { user, status, error } = useSelector((state) => state.auth);
 
     const {
         register,
@@ -33,6 +31,9 @@ const ChangePassword = () => {
     let oldPassword = watch("oldPassword");
     let newPassword = watch("newPassword");
     let confirmPassword = watch("confirmPassword");
+
+
+    let { user, status, error } = useSelector((state) => state.auth);
 
     function onSubmit() {
         let data = {

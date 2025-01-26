@@ -9,12 +9,22 @@ import Compressor from 'compressorjs';
 
 const Profile = () => {
   const dispatch = useDispatch()
-  let { user, status, error } = useSelector((state) => state.auth)
+
   const [name, setName] = useState()
   const [email, setEmail] = useState()
   const [image, setImage] = useState()
 
   const imageRef = useRef(null)
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm()
+
+  let { user, status, error } = useSelector((state) => state.auth)
 
   function handleFileInput(e) {
     let file = e.target.files[0];
@@ -30,14 +40,6 @@ const Profile = () => {
   function handleImage() {
     imageRef.current.click()
   }
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors }
-  } = useForm()
 
   async function onSubmit(data) {
     let compressedAvatar

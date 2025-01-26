@@ -12,21 +12,41 @@ import { IoCloseOutline } from 'react-icons/io5'
 import { useUsersWithMessagesQuery } from '../app/api'
 
 const Header = () => {
-  let { message, users, prevUsers, errro } = useSelector((state) => state.message)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
+
   const [mode, setMode] = useState(localStorage.getItem("theme") === "dark" ? true : (localStorage.getItem("theme") === null ? null : false))
   const [show, setShow] = useState(false)
   const [search, setSearch] = useState(false)
   const [searchText, setSearchText] = useState("")
-  const { user, status, error } = useSelector((state) => state.auth)
-  const dispatch = useDispatch()
-
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
+
+  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
+
+  const { user, status, error } = useSelector((state) => state.auth)
+  let { message, users, prevUsers, errro } = useSelector((state) => state.message)
 
   useEffect(() => {
     document.body.className = "";
     document.body.classList.add(theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (searchText === "") {
+      refetch()
+    } else {
+      dispatch(getUsers(searchText))
+    }
+  }, [searchText])
+
+  function handleQuery(e) {
+    setSearchText(e.target.value)
+  }
+
+  function handleSearch() {
+    setSearchText("")
+    setSearch(!search)
+  }
 
   function handleClick() {
     if (mode) {
@@ -58,32 +78,6 @@ const Header = () => {
     fetchUserData()
   }
 
-  const { data, isError, isLoading, refetch } = useUsersWithMessagesQuery();
-
-  function handleQuery(e) {
-    setSearchText(e.target.value)
-    // if (searchText === "") {
-    //   refetch()
-    // } else {
-    //   dispatch(getUsers(searchText))
-    // }
-  }
-
-  useEffect(() => {
-    if (searchText === "") {
-      refetch()
-    } else {
-      dispatch(getUsers(searchText))
-    }
-  }, [searchText])
-
-  // console.log(searchText)
-
-  function handleSearch() {
-    setSearchText("")
-    setSearch(!search)
-  }
-
   return (
     <div>
       <nav className="dark:bg-[#1A2236] relative h-16 dark:text-[#C6C8CD] flex justify-between items-center px-4 border-b-[1px] dark:border-white/10 border-black/30">
@@ -93,7 +87,7 @@ const Header = () => {
         </div>
         <h2 onClick={() => navigate("/")} className='text-xl font-bold cursor-pointer'>Chat</h2>
         <div className='flex items-center gap-3'>
-          <div className='cursor-pointer select-none' onClick={handleClick}>{mode ? <MdOutlineLightMode color='#0A80FF' size={"1.5em"} /> : (mode === null ? <MdOutlineLightMode color='#0A80FF' size={"1.5em"} />: <MdDarkMode color='#0A80FF' size={"1.5em"} />)}</div>
+          <div className='cursor-pointer select-none' onClick={handleClick}>{mode ? <MdOutlineLightMode color='#0A80FF' size={"1.5em"} /> : (mode === null ? <MdOutlineLightMode color='#0A80FF' size={"1.5em"} /> : <MdDarkMode color='#0A80FF' size={"1.5em"} />)}</div>
           {!user ? null : <IoIosSearch className='cursor-pointer select-none' onClick={handleSearch} color='#0A80FF' size={"1.5em"} />}
           {!user ? null : <img onClick={handleProfile} className='w-[1.5em] h-[1.5em] object-cover cursor-pointer rounded-full' src={user.avatar} />}
         </div>

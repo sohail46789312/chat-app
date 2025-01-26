@@ -9,9 +9,10 @@ import { GoEyeClosed } from 'react-icons/go';
 import { RxEyeOpen } from 'react-icons/rx';
 
 const Signup = () => {
-  const [pass, setPass] = useState(true)
-  const { user, status, error } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
+
+  const [pass, setPass] = useState(true)
+
   const {
     register,
     handleSubmit,
@@ -28,6 +29,8 @@ const Signup = () => {
     email,
     password
   }
+
+  const { user, status, error } = useSelector((state) => state.auth)
 
   function onSubmit(data) {
     dispatch(signup(formData))

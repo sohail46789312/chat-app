@@ -11,7 +11,6 @@ import { RxEyeOpen } from 'react-icons/rx';
 const ForgotPassword = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    let { user, status, error } = useSelector((state) => state.auth)
 
     const {
         register,
@@ -23,16 +22,18 @@ const ForgotPassword = () => {
 
     let email = watch("email")
 
+    let { user, status, error } = useSelector((state) => state.auth)
+
     async function onSubmit() {
         await dispatch(forgotPassword(email))
         navigate("/resetpassword")
     }
 
     return (
-        <div style={{minHeight: "calc(100vh - 64px)"}} className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
+        <div style={{ minHeight: "calc(100vh - 64px)" }} className='dark:bg-[#1A2236] dark:text-[#C6C8CD] flex flex-col items-center gap-8 pt-8'>
             <h1 className=' text-3xl font-bold'>Forgot Password</h1>
             <form onSubmit={handleSubmit(onSubmit)} action="" className='flex flex-col gap-4 items-center'>
-                    <p className='w-80 text-center text-green-800'>Enter your email so we can send reset password link to you</p>
+                <p className='w-80 text-center text-green-800'>Enter your email so we can send reset password link to you</p>
                 <div className='relative'>
                     <input value={email || ""} {...register("email")} className='bg-transparent p-3 rounded-md w-80 border-[1px] dark:border-white/10 border-black/30 placeholder-black/60 dark:placeholder-white/60' placeholder="Enter Email" />
                 </div>
